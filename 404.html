@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lokal</title>
+<meta name="robots" content="noindex">
+<style>
+  :root { --bg: #FFFFFF; --fg: #111111; --muted: #5B6170; --accent: #D10F5C; --cyan: #0BA5C7; --card: #F3F4F7; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0A1640; --fg: #FFFFFF; --muted: #AEB7D6; --accent: #FF2E8A; --cyan: #3EE0FF; --card: #1B2D6B; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 480px; margin: 0 auto; padding: 32px 16px 48px; }
+  .logo { font-weight: 900; font-style: italic; font-size: 34px; letter-spacing: -1px; }
+  .logo span { color: var(--accent); }
+  .carte { background: var(--card); border-radius: 16px; padding: 20px; margin: 24px 0; }
+  h1 { font-size: 24px; line-height: 1.2; margin: 0 0 8px; }
+  .quand { color: var(--cyan); font-weight: 700; }
+  .lieu, .note { color: var(--muted); }
+  .btn { display: block; text-align: center; text-decoration: none; font-weight: 800; border-radius: 14px; padding: 14px 16px; margin: 12px 0; }
+  .principal { background: var(--accent); color: #FFFFFF; }
+  .secondaire { border: 2px solid var(--fg); color: var(--fg); }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo">Lokal<span>.</span></div>
+  <div class="carte" id="carte"><p class="note">Chargement…</p></div>
+  <a class="btn principal" id="ouvrir" href="lokal://">Ouvrir dans Lokal</a>
+  <a class="btn secondaire" href="https://play.google.com/store/apps/details?id=be.lokalapp.app">Installer Lokal (Android)</a>
+  <p class="note">Lokal montre sur une carte toutes les sorties autour de toi en Belgique : soirées, fêtes de village, culture, sport, jeux. Ton agenda Lokal dans ta poche.</p>
+</main>
+<script>
+// Page des QR codes Lokal : lokalapp.be/e/<numéro de l'événement>.
+// Elle lit seulement ce que tout le monde voit déjà dans l'appli (clé publique ; les événements privés ou retirés n'apparaissent pas).
+(function () {
+  var carte = document.getElementById("carte");
+  var m = /^\/e\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i.exec(location.pathname);
+  function texte(balise, classe, contenu) { var e = document.createElement(balise); if (classe) e.className = classe; e.textContent = contenu; return e; }
+  function rien(msg) { carte.replaceChildren(texte("h1", "", msg), texte("p", "note", "Regarde les autres sorties dans l'appli.")); }
+  if (!m) { rien("Cette page n'existe pas."); return; }
+  var id = m[1].toLowerCase();
+  document.getElementById("ouvrir").href = "lokal://evenement/" + id;
+  var url = "https://ggubfbpiqmbzakyywezf.supabase.co/rest/v1/evenements?select=titre,date_debut,heure_debut,village,lieu,statut&id=eq." + id;
+  fetch(url, { headers: { apikey: "sb_publishable_FCD3P6-hoMV-9RgHQq5VAw_4rhAQZUP" } })
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (l) {
+      var e = l && l[0];
+      if (!e) { rien("Cet événement n'est plus sur Lokal."); return; }
+      var d = new Date(e.date_debut + "T12:00:00");
+      var jour = d.toLocaleDateString("fr-BE", { weekday: "long", day: "numeric", month: "long" });
+      var statut = e.statut === "annule" ? "ANNULÉ · " : e.statut === "reporte" ? "REPORTÉ · " : "";
+      document.title = e.titre + " · Lokal";
+      carte.replaceChildren(
+        texte("h1", "", statut + e.titre),
+        texte("p", "quand", jour + " à " + String(e.heure_debut).slice(0, 5).replace(":", " h ")),
+        texte("p", "lieu", (e.lieu ? e.lieu + ", " : "") + e.village)
+      );
+    })
+    .catch(function () { rien("Pas de connexion. Réessaie dans un instant."); });
+})();
+</script>
+</body>
+</html>
