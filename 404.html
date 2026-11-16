@@ -20,6 +20,10 @@
   .btn { display: block; text-align: center; text-decoration: none; font-weight: 800; border-radius: 14px; padding: 14px 16px; margin: 12px 0; }
   .principal { background: var(--accent); color: #FFFFFF; }
   .secondaire { border: 2px solid var(--fg); color: var(--fg); }
+  .ligne { display: flex; flex-direction: column; text-decoration: none; color: var(--fg); padding: 10px 0; border-top: 1px solid rgba(128,128,128,.25); }
+  .ligne strong { font-size: 17px; }
+  .ligne span { font-size: 15px; }
+  .code { font: 800 30px/1.2 ui-monospace, monospace; letter-spacing: 3px; color: var(--accent); }
 </style>
 </head>
 <body>
@@ -31,33 +35,93 @@
   <p class="note">Lokal montre sur une carte toutes les sorties autour de toi en Belgique : soirées, fêtes de village, culture, sport, jeux. Ton agenda Lokal dans ta poche.</p>
 </main>
 <script>
-// Page des QR codes Lokal : lokalapp.be/e/<numéro de l'événement>.
-// Elle lit seulement ce que tout le monde voit déjà dans l'appli (clé publique ; les événements privés ou retirés n'apparaissent pas).
+// Pages des QR codes Lokal :
+//   /e/<événement>   /o/<organisateur>   /lieu/<village>/<salle>   /c/<village>   /i/<code d'invitation>
+// Elles lisent seulement ce que tout le monde voit déjà dans l'appli (clé publique ; les événements privés ou retirés n'apparaissent pas).
 (function () {
+  var BASE = "https://ggubfbpiqmbzakyywezf.supabase.co/rest/v1/";
+  var CLE = "sb_publishable_FCD3P6-hoMV-9RgHQq5VAw_4rhAQZUP";
+  var UUID = "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})";
   var carte = document.getElementById("carte");
-  var m = /^\/e\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/?$/i.exec(location.pathname);
+  var ouvrir = document.getElementById("ouvrir");
+  var chemin = location.pathname;
   function texte(balise, classe, contenu) { var e = document.createElement(balise); if (classe) e.className = classe; e.textContent = contenu; return e; }
   function rien(msg) { carte.replaceChildren(texte("h1", "", msg), texte("p", "note", "Regarde les autres sorties dans l'appli.")); }
-  if (!m) { rien("Cette page n'existe pas."); return; }
-  var id = m[1].toLowerCase();
-  document.getElementById("ouvrir").href = "lokal://evenement/" + id;
-  var url = "https://ggubfbpiqmbzakyywezf.supabase.co/rest/v1/evenements?select=titre,date_debut,heure_debut,village,lieu,statut&id=eq." + id;
-  fetch(url, { headers: { apikey: "sb_publishable_FCD3P6-hoMV-9RgHQq5VAw_4rhAQZUP" } })
-    .then(function (r) { return r.ok ? r.json() : []; })
-    .then(function (l) {
+  function lire(url) { return fetch(BASE + url, { headers: { apikey: CLE } }).then(function (r) { return r.ok ? r.json() : []; }); }
+  function dec(s) { try { return decodeURIComponent(s).slice(0, 60); } catch (e) { return ""; } }
+  // Recherche exacte sans tenir compte des majuscules (les caractères spéciaux de la recherche sont neutralisés).
+  function exact(s) { return encodeURIComponent(s.replace(/[\\%_*]/g, function (c) { return "\\" + c; })); }
+  function jourDe(e) { return new Date(e.date_debut + "T12:00:00").toLocaleDateString("fr-BE", { weekday: "long", day: "numeric", month: "long" }); }
+  function heureDe(e) { return String(e.heure_debut).slice(0, 5).replace(":", " h "); }
+  var aujourdhui = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  var CHAMPS = "evenements?select=id,titre,date_debut,date_fin,heure_debut,village,lieu,statut";
+  var A_VENIR = "&statut=neq.annule&or=(date_fin.gte." + aujourdhui + ",and(date_fin.is.null,date_debut.gte." + aujourdhui + "))&order=date_debut,heure_debut&limit=30";
+
+  // Une liste d'événements à venir (chaque ligne ouvre sa page).
+  function liste(titre, sous, evenements) {
+    var enfants = [texte("h1", "", titre)];
+    if (sous) enfants.push(texte("p", "lieu", sous));
+    if (!evenements.length) enfants.push(texte("p", "note", "Rien de prévu pour l'instant. Reviens bientôt !"));
+    evenements.forEach(function (e) {
+      var a = document.createElement("a");
+      a.className = "ligne";
+      a.href = "/e/" + e.id;
+      a.append(texte("strong", "", (e.statut === "reporte" ? "REPORTÉ · " : "") + e.titre), texte("span", "quand", jourDe(e) + " à " + heureDe(e)), texte("span", "lieu", (e.lieu ? e.lieu + ", " : "") + e.village));
+      enfants.push(a);
+    });
+    carte.replaceChildren.apply(carte, enfants);
+  }
+  function erreur() { rien("Pas de connexion. Réessaie dans un instant."); }
+
+  var m;
+  if ((m = new RegExp("^/e/" + UUID + "/?$", "i").exec(chemin))) {
+    var id = m[1].toLowerCase();
+    ouvrir.href = "lokal://evenement/" + id;
+    lire("evenements?select=titre,date_debut,heure_debut,village,lieu,statut&id=eq." + id).then(function (l) {
       var e = l && l[0];
       if (!e) { rien("Cet événement n'est plus sur Lokal."); return; }
-      var d = new Date(e.date_debut + "T12:00:00");
-      var jour = d.toLocaleDateString("fr-BE", { weekday: "long", day: "numeric", month: "long" });
       var statut = e.statut === "annule" ? "ANNULÉ · " : e.statut === "reporte" ? "REPORTÉ · " : "";
       document.title = e.titre + " · Lokal";
-      carte.replaceChildren(
-        texte("h1", "", statut + e.titre),
-        texte("p", "quand", jour + " à " + String(e.heure_debut).slice(0, 5).replace(":", " h ")),
-        texte("p", "lieu", (e.lieu ? e.lieu + ", " : "") + e.village)
-      );
-    })
-    .catch(function () { rien("Pas de connexion. Réessaie dans un instant."); });
+      carte.replaceChildren(texte("h1", "", statut + e.titre), texte("p", "quand", jourDe(e) + " à " + heureDe(e)), texte("p", "lieu", (e.lieu ? e.lieu + ", " : "") + e.village));
+    }).catch(erreur);
+  } else if ((m = new RegExp("^/o/" + UUID + "/?$", "i").exec(chemin))) {
+    var org = m[1].toLowerCase();
+    ouvrir.href = "lokal://organisateur/" + org;
+    Promise.all([lire("createurs?select=nom,commune&id=eq." + org), lire(CHAMPS + "&createur=eq." + org + A_VENIR)]).then(function (r) {
+      var c = r[0] && r[0][0];
+      if (!c) { rien("Cet organisateur n'est plus sur Lokal."); return; }
+      document.title = c.nom + " · Lokal";
+      liste(c.nom, "Organisateur à " + c.commune + " · prochains événements", r[1]);
+    }).catch(erreur);
+  } else if ((m = /^\/lieu\/([^/]{1,180})\/([^/]{1,180})\/?$/.exec(chemin)) && dec(m[1]) && dec(m[2])) {
+    var village = dec(m[1]), salle = dec(m[2]);
+    ouvrir.href = "lokal://lieu?lieu=" + encodeURIComponent(salle) + "&village=" + encodeURIComponent(village);
+    lire(CHAMPS + "&lieu=ilike." + exact(salle) + "&village=ilike." + exact(village) + A_VENIR).then(function (l) {
+      document.title = salle + " · Lokal";
+      liste(salle, village + " · bientôt dans cette salle", l);
+    }).catch(erreur);
+  } else if ((m = /^\/c\/([^/]{1,180})\/?$/.exec(chemin)) && dec(m[1])) {
+    var nom = dec(m[1]);
+    ouvrir.href = "lokal://?village=" + encodeURIComponent(nom);
+    lire(CHAMPS + "&village=ilike." + exact(nom) + A_VENIR).then(function (l) {
+      document.title = nom + " · Lokal";
+      liste("Bientôt à " + nom, "Les prochaines sorties publiées sur Lokal", l);
+    }).catch(erreur);
+  } else if ((m = /^\/i\/([A-Za-z0-9]{8})\/?$/.exec(chemin))) {
+    var code = m[1].toUpperCase();
+    ouvrir.href = "lokal://amis?code=" + code;
+    document.title = "Invitation · Lokal";
+    carte.replaceChildren(
+      texte("h1", "", "On t'invite sur Lokal"),
+      texte("p", "", "1. Installe Lokal (bouton ci-dessous)."),
+      texte("p", "", "2. Crée ton compte."),
+      texte("p", "", "3. Va dans Profil, puis Mes amis, et entre ce code :"),
+      texte("p", "code", code.slice(0, 4) + "-" + code.slice(4)),
+      texte("p", "note", "Si Lokal est déjà installé, touche « Ouvrir dans Lokal » : le code est rempli pour toi.")
+    );
+  } else {
+    rien("Cette page n'existe pas.");
+  }
 })();
 </script>
 </body>
