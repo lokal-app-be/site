@@ -6,8 +6,8 @@
 <title>Lokal</title>
 <meta name="robots" content="noindex">
 <style>
-  :root { --bg: #FFFFFF; --fg: #111111; --muted: #5B6170; --accent: #D10F5C; --cyan: #0BA5C7; --card: #F3F4F7; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #0A1640; --fg: #FFFFFF; --muted: #AEB7D6; --accent: #FF2E8A; --cyan: #3EE0FF; --card: #1B2D6B; } }
+  :root { --bg: #FFFFFF; --fg: #111111; --muted: #5B6170; --accent: #D10F5C; --sur-accent: #FFFFFF; --cyan: #00788F; --card: #F3F4F7; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0A1640; --fg: #FFFFFF; --muted: #AEB7D6; --accent: #FF2E8A; --sur-accent: #0A1640; --cyan: #3EE0FF; --card: #1B2D6B; } }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   main { max-width: 480px; margin: 0 auto; padding: 32px 16px 48px; }
@@ -18,7 +18,8 @@
   .quand { color: var(--cyan); font-weight: 700; }
   .lieu, .note { color: var(--muted); }
   .btn { display: block; text-align: center; text-decoration: none; font-weight: 800; border-radius: 14px; padding: 14px 16px; margin: 12px 0; }
-  .principal { background: var(--accent); color: #FFFFFF; }
+  .principal { background: var(--accent); color: var(--sur-accent); }
+  a:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
   .secondaire { border: 2px solid var(--fg); color: var(--fg); }
   .ligne { display: flex; flex-direction: column; text-decoration: none; color: var(--fg); padding: 10px 0; border-top: 1px solid rgba(128,128,128,.25); }
   .ligne strong { font-size: 17px; }
@@ -29,10 +30,12 @@
 <body>
 <main>
   <div class="logo">Lokal<span>.</span></div>
-  <div class="carte" id="carte"><p class="note">Chargement…</p></div>
+  <div class="carte" id="carte" aria-live="polite"><p class="note">Chargement…</p></div>
+  <noscript><p class="note">Cette page a besoin de JavaScript pour afficher la sortie. Tu peux aussi la retrouver dans l'appli Lokal.</p></noscript>
   <a class="btn principal" id="ouvrir" href="lokal://">Ouvrir dans Lokal</a>
   <a class="btn secondaire" href="https://play.google.com/store/apps/details?id=be.lokalapp.app">Installer Lokal (Android)</a>
   <p class="note">Lokal montre sur une carte toutes les sorties autour de toi en Belgique : soirées, fêtes de village, culture, sport, jeux. Ton agenda Lokal dans ta poche.</p>
+  <p class="note"><a href="/mentions-legales" style="color:inherit">Mentions légales</a> · <a href="/confidentialite" style="color:inherit">Confidentialité</a> · <a href="/conditions" style="color:inherit">Conditions d'utilisation</a></p>
 </main>
 <script>
 // Pages des QR codes Lokal :
