@@ -2,143 +2,47 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-+/ZxouIPlyjbAUMOXeVP9wWCavD98grmUFQn5RQ0E6k='; style-src 'unsafe-inline'; img-src 'self' data:; connect-src https://ggubfbpiqmbzakyywezf.supabase.co; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Une sortie sur Lokal</title>
-<meta name="description" content="Ouvre cette sortie dans Lokal : toutes les sorties autour de toi en Belgique, sur une carte. Ton agenda Lokal dans ta poche.">
+<title>Lokal arrive bientôt</title>
+<meta name="description" content="Lokal montre sur une carte toutes les sorties autour de toi en Belgique. Bientôt sur Android et iPhone.">
 <meta name="robots" content="noindex">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Lokal">
 <meta property="og:locale" content="fr_BE">
-<meta property="og:title" content="Une sortie sur Lokal">
-<meta property="og:description" content="Ouvre cette sortie dans Lokal : toutes les sorties autour de toi en Belgique, sur une carte.">
+<meta property="og:title" content="Lokal arrive bientôt">
+<meta property="og:description" content="Toutes les sorties autour de toi en Belgique, sur une carte. Bientôt sur Android et iPhone.">
 <meta property="og:image" content="https://lokalapp.be/partage.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Logo Lokal">
 <meta name="twitter:card" content="summary_large_image">
 <style>
-  :root { --bg: #FFFFFF; --fg: #111111; --muted: #5B6170; --accent: #D10F5C; --sur-accent: #FFFFFF; --cyan: #00788F; --card: #F3F4F7; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #0A1640; --fg: #FFFFFF; --muted: #AEB7D6; --accent: #FF2E8A; --sur-accent: #0A1640; --cyan: #3EE0FF; --card: #1B2D6B; } }
+  :root { --bg: #FFFFFF; --fg: #111111; --muted: #5B6170; --accent: #D10F5C; --sur-accent: #FFFFFF; --card: #F3F4F7; }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   main { max-width: 480px; margin: 0 auto; padding: 32px 16px 48px; }
   .logo { font-weight: 900; font-style: italic; font-size: 34px; letter-spacing: -1px; }
   .logo span { color: var(--accent); }
-  .carte { background: var(--card); border-radius: 16px; padding: 20px; margin: 24px 0; }
+  .carte { background: var(--card); border-radius: 20px; padding: 20px; margin: 24px 0; }
   h1 { font-size: 24px; line-height: 1.2; margin: 0 0 8px; }
-  .quand { color: var(--cyan); font-weight: 700; }
-  .lieu, .note { color: var(--muted); }
-  .btn { display: block; text-align: center; text-decoration: none; font-weight: 800; border-radius: 14px; padding: 14px 16px; margin: 12px 0; }
-  .principal { background: var(--accent); color: var(--sur-accent); }
+  p { color: var(--muted); }
+  .bientot { display: inline-block; font-weight: 800; border-radius: 999px; padding: 8px 16px; margin: 8px 0 0; border: 2px solid var(--accent); color: var(--accent); }
+  a { color: inherit; }
   a:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
-  .secondaire { border: 2px solid var(--fg); color: var(--fg); }
-  .ligne { display: flex; flex-direction: column; text-decoration: none; color: var(--fg); padding: 10px 0; border-top: 1px solid rgba(128,128,128,.25); }
-  .ligne strong { font-size: 17px; }
-  .ligne span { font-size: 15px; }
-  .code { font: 800 30px/1.2 ui-monospace, monospace; letter-spacing: 3px; color: var(--accent); }
 </style>
 </head>
 <body>
 <main>
   <div class="logo">Lokal<span>.</span></div>
-  <div class="carte" id="carte" aria-live="polite"><p class="note">Chargement…</p></div>
-  <noscript><p class="note">Cette page a besoin de JavaScript pour afficher la sortie. Tu peux aussi la retrouver dans l'appli Lokal.</p></noscript>
-  <a class="btn principal" id="ouvrir" href="lokal://">Ouvrir dans Lokal</a>
-  <a class="btn secondaire" href="https://play.google.com/store/apps/details?id=be.lokalapp.app">Installer Lokal (Android)</a>
-  <p class="note">Lokal montre sur une carte toutes les sorties autour de toi en Belgique : soirées, fêtes de village, culture, sport, jeux. Ton agenda Lokal dans ta poche.</p>
-  <p class="note"><a href="/mentions-legales" style="color:inherit">Mentions légales</a> · <a href="/confidentialite" style="color:inherit">Confidentialité</a> · <a href="/conditions" style="color:inherit">Conditions d'utilisation</a></p>
+  <div class="carte">
+    <h1>Cette page n'est pas encore disponible.</h1>
+    <p>Lokal montre sur une carte toutes les sorties autour de toi en Belgique : soirées, fêtes de village, culture, sport, jeux. Ton agenda Lokal dans ta poche.</p>
+    <p class="bientot">Bientôt sur Android et iPhone</p>
+  </div>
+  <p><a href="/">Retour à l'accueil</a> · Contact : <a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a></p>
+  <p><a href="/mentions-legales">Mentions légales</a> · <a href="/confidentialite">Confidentialité</a> · <a href="/conditions">Conditions d'utilisation</a></p>
 </main>
-<script>
-// Pages des QR codes Lokal :
-//   /e/<événement>   /o/<organisateur>   /lieu/<village>/<salle>   /c/<village>   /i/<code d'invitation>
-// Elles lisent seulement ce que tout le monde voit déjà dans l'appli (clé publique ; les événements privés ou retirés n'apparaissent pas).
-(function () {
-  var BASE = "https://ggubfbpiqmbzakyywezf.supabase.co/rest/v1/";
-  var CLE = "sb_publishable_FCD3P6-hoMV-9RgHQq5VAw_4rhAQZUP";
-  var UUID = "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})";
-  var carte = document.getElementById("carte");
-  var ouvrir = document.getElementById("ouvrir");
-  var chemin = location.pathname;
-  function texte(balise, classe, contenu) { var e = document.createElement(balise); if (classe) e.className = classe; e.textContent = contenu; return e; }
-  function rien(msg) { carte.replaceChildren(texte("h1", "", msg), texte("p", "note", "Regarde les autres sorties dans l'appli.")); }
-  function lire(url) { return fetch(BASE + url, { headers: { apikey: CLE } }).then(function (r) { return r.ok ? r.json() : []; }); }
-  function dec(s) { try { return decodeURIComponent(s).slice(0, 60); } catch (e) { return ""; } }
-  // Recherche exacte sans tenir compte des majuscules (les caractères spéciaux de la recherche sont neutralisés).
-  function exact(s) { return encodeURIComponent(s.replace(/[\\%_*]/g, function (c) { return "\\" + c; })); }
-  function jourDe(e) { return new Date(e.date_debut + "T12:00:00").toLocaleDateString("fr-BE", { weekday: "long", day: "numeric", month: "long" }); }
-  function heureDe(e) { return String(e.heure_debut).slice(0, 5).replace(":", " h "); }
-  var aujourdhui = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-  var CHAMPS = "evenements?select=id,titre,date_debut,date_fin,heure_debut,village,lieu,statut";
-  var A_VENIR = "&statut=neq.annule&or=(date_fin.gte." + aujourdhui + ",and(date_fin.is.null,date_debut.gte." + aujourdhui + "))&order=date_debut,heure_debut&limit=30";
-
-  // Une liste d'événements à venir (chaque ligne ouvre sa page).
-  function liste(titre, sous, evenements) {
-    var enfants = [texte("h1", "", titre)];
-    if (sous) enfants.push(texte("p", "lieu", sous));
-    if (!evenements.length) enfants.push(texte("p", "note", "Rien de prévu pour l'instant. Reviens bientôt !"));
-    evenements.forEach(function (e) {
-      var a = document.createElement("a");
-      a.className = "ligne";
-      a.href = "/e/" + e.id;
-      a.append(texte("strong", "", (e.statut === "reporte" ? "REPORTÉ · " : "") + e.titre), texte("span", "quand", jourDe(e) + " à " + heureDe(e)), texte("span", "lieu", (e.lieu ? e.lieu + ", " : "") + e.village));
-      enfants.push(a);
-    });
-    carte.replaceChildren.apply(carte, enfants);
-  }
-  function erreur() { rien("Pas de connexion. Réessaie dans un instant."); }
-
-  var m;
-  if ((m = new RegExp("^/e/" + UUID + "/?$", "i").exec(chemin))) {
-    var id = m[1].toLowerCase();
-    ouvrir.href = "lokal://evenement/" + id;
-    lire("evenements?select=titre,date_debut,heure_debut,village,lieu,statut&id=eq." + id).then(function (l) {
-      var e = l && l[0];
-      if (!e) { rien("Cet événement n'est plus sur Lokal."); return; }
-      var statut = e.statut === "annule" ? "ANNULÉ · " : e.statut === "reporte" ? "REPORTÉ · " : "";
-      document.title = e.titre + " · Lokal";
-      carte.replaceChildren(texte("h1", "", statut + e.titre), texte("p", "quand", jourDe(e) + " à " + heureDe(e)), texte("p", "lieu", (e.lieu ? e.lieu + ", " : "") + e.village));
-    }).catch(erreur);
-  } else if ((m = new RegExp("^/o/" + UUID + "/?$", "i").exec(chemin))) {
-    var org = m[1].toLowerCase();
-    ouvrir.href = "lokal://organisateur/" + org;
-    Promise.all([lire("createurs?select=nom,commune&id=eq." + org), lire(CHAMPS + "&createur=eq." + org + A_VENIR)]).then(function (r) {
-      var c = r[0] && r[0][0];
-      if (!c) { rien("Cet organisateur n'est plus sur Lokal."); return; }
-      document.title = c.nom + " · Lokal";
-      liste(c.nom, "Organisateur à " + c.commune + " · prochains événements", r[1]);
-    }).catch(erreur);
-  } else if ((m = /^\/lieu\/([^/]{1,180})\/([^/]{1,180})\/?$/.exec(chemin)) && dec(m[1]) && dec(m[2])) {
-    var village = dec(m[1]), salle = dec(m[2]);
-    ouvrir.href = "lokal://lieu?lieu=" + encodeURIComponent(salle) + "&village=" + encodeURIComponent(village);
-    lire(CHAMPS + "&lieu=ilike." + exact(salle) + "&village=ilike." + exact(village) + A_VENIR).then(function (l) {
-      document.title = salle + " · Lokal";
-      liste(salle, village + " · bientôt dans cette salle", l);
-    }).catch(erreur);
-  } else if ((m = /^\/c\/([^/]{1,180})\/?$/.exec(chemin)) && dec(m[1])) {
-    var nom = dec(m[1]);
-    ouvrir.href = "lokal://?village=" + encodeURIComponent(nom);
-    lire(CHAMPS + "&village=ilike." + exact(nom) + A_VENIR).then(function (l) {
-      document.title = nom + " · Lokal";
-      liste("Bientôt à " + nom, "Les prochaines sorties publiées sur Lokal", l);
-    }).catch(erreur);
-  } else if ((m = /^\/i\/([A-Za-z0-9]{8})\/?$/.exec(chemin))) {
-    var code = m[1].toUpperCase();
-    ouvrir.href = "lokal://amis?code=" + code;
-    document.title = "Invitation · Lokal";
-    carte.replaceChildren(
-      texte("h1", "", "On t'invite sur Lokal"),
-      texte("p", "", "1. Installe Lokal (bouton ci-dessous)."),
-      texte("p", "", "2. Crée ton compte."),
-      texte("p", "", "3. Va dans Profil, puis Mes amis, et entre ce code :"),
-      texte("p", "code", code.slice(0, 4) + "-" + code.slice(4)),
-      texte("p", "note", "Si Lokal est déjà installé, touche « Ouvrir dans Lokal » : le code est rempli pour toi.")
-    );
-  } else {
-    rien("Cette page n'existe pas.");
-  }
-})();
-</script>
 </body>
 </html>
