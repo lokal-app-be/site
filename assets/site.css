@@ -39,12 +39,12 @@ a { color: var(--rose); }
 .nav a:hover { color: var(--rose); }
 /* Téléphone : le logo et « Bientôt » sur la 1re ligne, les liens du menu sur une 2e ligne. */
 @media (max-width: 759px) {
-  .tete { position: relative; flex-wrap: wrap; justify-content: flex-start; row-gap: 0; padding-top: 10px; }
+  .tete { position: relative; flex-wrap: wrap; justify-content: flex-start; gap: 0 12px; padding-top: 10px; }
   .marque { margin-right: auto; }
   .nav { display: contents; }
   .nav .bientot { order: 1; }
   .tete::after { content: ""; order: 2; flex-basis: 100%; }
-  .nav .lien { order: 3; display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; margin-right: 18px; }
+  .nav .lien { order: 3; display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; margin-right: 8px; }
 }
 @media (min-width: 760px) { .marque img { height: 38px; } .tete { min-height: 72px; } }
 
