@@ -182,3 +182,8 @@ textarea.champ { height: 110px; padding: 12px 14px; resize: vertical; }
 .bloc { align-content: start; }
 .champ, textarea.champ { font: 500 15px var(--police); color: var(--fg); }
 .actions { align-items: center; }
+/* Textes longs (téléphone) : la pastille passe à la ligne au lieu d'élargir la carte */
+.liste, .partie { grid-template-columns: minmax(0, 1fr); }
+.bloc { min-width: 0; }
+.bloc .pills .pastille { white-space: normal; height: auto; min-height: 22px; padding: 4px 9px; line-height: 1.3; }
+.partie-tete .note, .citation, .detail { overflow-wrap: anywhere; }
