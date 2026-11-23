@@ -1,0 +1,98 @@
+/* Site lokalapp.be : charte « Lokal épuré », mode jour (validée le 17 novembre 2026).
+   Une seule police (Rubik), 3 arrondis (14 champs · 20 cartes · rond complet), boutons noirs avec l'ombre rose décalée.
+   Trois tailles d'écran, même logique partout : téléphone (< 760 px), tablette (760 à 1199 px), ordinateur (≥ 1200 px). */
+
+@font-face { font-family: Rubik; font-style: normal; font-weight: 500; font-display: swap; src: url("polices/rubik-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: Rubik; font-style: normal; font-weight: 600; font-display: swap; src: url("polices/rubik-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: Rubik; font-style: normal; font-weight: 700; font-display: swap; src: url("polices/rubik-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: Rubik; font-style: italic; font-weight: 900; font-display: swap; src: url("polices/rubik-latin-900-italic.woff2") format("woff2"); }
+
+:root {
+  --bg: #F3F4F7; --surface: #FFFFFF; --surface2: #E9EBF0; --line: #DCDFE6;
+  --fg: #111111; --muted: #5B6275; --rose: #D10F5C;
+  --r-champ: 14px; --r-carte: 20px; --rond: 999px;
+  --ombre-carte: 0 6px 18px rgba(17, 17, 17, .06);
+  --police: Rubik, "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  --marge: 16px; --large: 1160px;
+  color-scheme: light;
+}
+@media (min-width: 760px) { :root { --marge: 24px; } }
+@media (min-width: 1200px) { :root { --marge: 32px; } }
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 500 15px/1.5 var(--police); overflow-x: hidden; }
+img, svg { display: block; }
+button, input { font: inherit; color: inherit; }
+a { color: var(--rose); }
+:focus-visible { outline: 3px solid var(--rose); outline-offset: 3px; }
+.cache { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.cadre { padding-left: max(var(--marge), env(safe-area-inset-left), calc((100% - var(--large)) / 2)); padding-right: max(var(--marge), env(safe-area-inset-right), calc((100% - var(--large)) / 2)); }
+
+/* ---------- En-tête ---------- */
+.tete { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; background: var(--surface); border-bottom: 1.5px solid var(--line); }
+.marque { display: block; flex: none; }
+.marque img { height: 34px; width: auto; }
+.nav { display: flex; align-items: center; gap: 24px; font: 600 15px var(--police); }
+.nav a { color: var(--fg); text-decoration: none; }
+.nav a:hover { color: var(--rose); }
+.nav .lien { display: none; }
+@media (min-width: 760px) { .nav .lien { display: inline; } .marque img { height: 38px; } .tete { min-height: 72px; } }
+
+/* ---------- Boutons et pastilles (pièces de l'appli) ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 24px; border-radius: var(--rond); border: 2px solid var(--fg); background: var(--fg); color: #fff; box-shadow: 3px 3px 0 var(--rose); font: 900 italic 15px/1 var(--police); text-decoration: none; white-space: nowrap; cursor: pointer; }
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--rose); }
+.btn.sec { background: var(--surface); color: var(--fg); border: 1.5px solid var(--line); box-shadow: none; font: 700 15px/1 var(--police); }
+.btn.sec:hover { border-color: var(--fg); transform: none; }
+.btn.petit { min-height: 40px; padding: 0 16px; font-size: 13px; }
+/* Bouton vers l'appli tant qu'elle n'est pas sur les stores (choix d'Arnaud, 23 nov. 2026) : gris, ne mène nulle part. */
+.bientot { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 22px; border-radius: var(--rond); background: var(--surface2); color: var(--muted); font: 700 15px/1.2 var(--police); text-align: center; cursor: default; user-select: none; max-width: 100%; }
+.bientot.petit { min-height: 40px; padding: 0 16px; font-size: 13px; }
+.rond { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--fg); background: var(--surface); box-shadow: 3px 3px 0 var(--rose); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.rond svg { width: 20px; height: 20px; }
+.rond.petit { width: 40px; height: 40px; border: 1.5px solid var(--line); box-shadow: none; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pdate { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: var(--rond); background: var(--rose); color: #fff; font: 900 italic 11px/1 var(--police); white-space: nowrap; }
+.certif { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: var(--rond); border: 1.5px solid var(--fg); color: var(--fg); font: 700 11px/1 var(--police); white-space: nowrap; }
+.pannule { display: inline-flex; align-items: center; height: 22px; padding: 0 9px; border-radius: var(--rond); background: var(--fg); color: #fff; font: 700 11px/1 var(--police); }
+.ico { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; }
+.ico svg { width: 68%; height: 68%; }
+.ico.petit { width: 30px; height: 30px; }
+
+/* Carte d'un événement (liste, « À proximité ») : padding 14, icône 44, titre 16, détail 13 */
+.evc { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); padding: 14px; box-shadow: var(--ombre-carte); color: var(--fg); }
+button.evc { cursor: pointer; } button.evc:hover { border-color: var(--fg); }
+.evc-t { display: grid; gap: 4px; min-width: 0; }
+.evc b { font: 900 italic 16px/1.15 var(--police); overflow-wrap: anywhere; }
+.evc small { font: 500 13px/1.35 var(--police); color: var(--muted); }
+
+/* ---------- Pied de page ---------- */
+.pied { background: var(--surface); border-top: 1.5px solid var(--line); padding-top: 48px; padding-bottom: max(32px, env(safe-area-inset-bottom)); }
+.pied-grille { display: grid; grid-template-columns: 1fr; gap: 32px; }
+.pied-marque { display: grid; gap: 14px; align-content: start; }
+.pied-marque img { height: 34px; width: auto; }
+.pied p { margin: 0; color: var(--muted); max-width: 20rem; }
+.pied h2 { margin: 0 0 12px; font: 700 12px var(--police); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.pied ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.pied li a, .pied li span { display: inline-block; padding: 4px 0; color: var(--fg); text-decoration: none; }
+.pied li a:hover { color: var(--rose); }
+.pied li span { color: var(--muted); }
+.bas { margin-top: 40px; padding-top: 18px; border-top: 1.5px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; font-size: 13px; color: var(--muted); }
+@media (min-width: 760px) { .pied-grille { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1200px) { .pied-grille { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
+
+/* ---------- Pages de texte (légal, supprimer mon compte) ---------- */
+.texte-page { padding-top: 32px; padding-bottom: 56px; }
+.feuille { max-width: 760px; margin: 0 auto; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); box-shadow: var(--ombre-carte); padding: 24px var(--marge); }
+@media (min-width: 760px) { .feuille { padding: 40px 48px; } .texte-page { padding-top: 48px; } }
+.feuille h1 { margin: 0 0 8px; font: 900 italic 26px/1.08 var(--police); letter-spacing: -.3px; }
+@media (min-width: 760px) { .feuille h1 { font-size: 34px; } }
+.feuille h2 { margin: 32px 0 8px; font: 900 italic 20px/1.15 var(--police); }
+.feuille p, .feuille li { font-size: 16px; line-height: 1.6; }
+.feuille ul, .feuille ol { padding-left: 22px; }
+.feuille .note { color: var(--muted); font-size: 14px; }
+.feuille .petit { color: var(--muted); font-size: 13px; }
+.feuille table { width: 100%; border-collapse: collapse; font-size: 15px; display: block; overflow-x: auto; }
+.feuille th, .feuille td { text-align: left; padding: 8px 10px; border-bottom: 1.5px solid var(--line); vertical-align: top; }

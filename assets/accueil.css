@@ -1,0 +1,157 @@
+/* Accueil de lokalapp.be : maquette validée par Arnaud le 19 novembre 2026 (carrousel, flèche, carte, fiche à droite).
+   Téléphone (< 760 px) · tablette en hauteur (760-899 px) : la fiche s'ouvre par-dessus la carte, en plein écran (choix 3A).
+   Tablette en largeur et ordinateur (≥ 900 px) : carte à gauche, fiche à droite, deux blocs blancs arrondis. */
+
+/* ---------- Carrousel ---------- */
+.hero { background: var(--surface); border-bottom: 1.5px solid var(--line); padding-top: 24px; padding-bottom: 28px; }
+.piste { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; outline-offset: -3px; }
+.piste::-webkit-scrollbar { display: none; }
+.slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 24px; align-items: center; }
+.texte { display: grid; gap: 16px; align-content: center; max-width: 32rem; min-width: 0; }
+.kicker { margin: 0; font: 700 13px/1 var(--police); color: var(--rose); text-transform: uppercase; letter-spacing: .06em; }
+.slide h1, .slide h2 { margin: 0; font: 900 italic clamp(30px, 4.6vw, 48px)/1.08 var(--police); letter-spacing: -.5px; text-wrap: balance; }
+.slide h1 em, .slide h2 em { color: var(--rose); font-style: italic; }
+.texte p { margin: 0; color: var(--muted); font-size: 16px; max-width: 28rem; }
+.boutons { display: flex; flex-wrap: wrap; gap: 12px; }
+.etapes { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; counter-reset: e; color: var(--muted); font-size: 16px; }
+.etapes li { counter-increment: e; display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: baseline; }
+.etapes li::before { content: "0" counter(e); font: 900 italic 15px var(--police); color: var(--rose); }
+.adresse { font-size: 14px !important; } .adresse b { color: var(--fg); user-select: all; font-weight: 600; }
+
+/* Visuels : uniquement des pièces de l'appli (carte, repères, cartes d'événement, fiche), droits, arrondis 20. */
+.collage { position: relative; justify-self: center; width: min(100%, 340px); aspect-ratio: 1 / .9; }
+.collage > * { position: absolute; }
+.photo { left: 0; top: 0; width: 86%; border: 1.5px solid var(--line); border-radius: var(--r-carte); overflow: hidden; box-shadow: var(--ombre-carte); background: var(--surface); }
+.photo img { width: 100%; height: auto; }
+.collage .c2 { right: 0; bottom: 4%; width: 78%; }
+.tel { left: 50%; top: 0; width: 56%; height: 100%; transform: translateX(-50%); background: var(--fg); border-radius: 40px; padding: 8px; box-shadow: var(--ombre-carte); }
+.ecran { position: relative; width: 100%; height: 100%; border-radius: 32px; overflow: hidden; background: #EFEFEC; }
+.ecran img { position: absolute; left: 50%; top: 0; height: 100%; width: auto; max-width: none; transform: translateX(-50%); }
+.ecran .puces { position: absolute; top: 14px; left: 10px; right: 10px; display: flex; gap: 6px; }
+.chip { display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: var(--rond); border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); font: 600 13px/1 var(--police); white-space: nowrap; cursor: pointer; }
+.chip.actif { background: var(--fg); border-color: var(--fg); color: #fff; font: 900 italic 13px/1 var(--police); box-shadow: 3px 3px 0 var(--rose); }
+.ecran .chip { height: 30px; padding: 0 10px; font-size: 11px; box-shadow: none; }
+.ecran .evc { position: absolute; left: 8px; right: 8px; bottom: 10px; width: auto; padding: 10px; gap: 8px; }
+.ecran .evc .ico { width: 34px; height: 34px; }
+.ecran .evc b { font-size: 13px; }
+.pastille-gr { left: 0; top: 14%; z-index: 2; font: 900 italic 15px/1 var(--police); background: var(--rose); color: #fff; border-radius: var(--rond); padding: 10px 16px; }
+.affiche-b { left: 6%; right: 6%; top: 0; bottom: 0; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); overflow: hidden; box-shadow: var(--ombre-carte); display: grid; grid-template-rows: 1fr auto; }
+.affiche-b .aff { position: relative; display: grid; align-content: space-between; padding: 16px 14px 34px; color: #fff; font: 900 italic 21px/1.05 var(--police); background: linear-gradient(160deg, #B98CFF, #5A2AC0); }
+.affiche-b .aff::after { content: ""; position: absolute; inset: auto 0 0; height: 60%; background: linear-gradient(transparent, var(--surface)); }
+.affiche-b .aff span, .affiche-b .aff small { position: relative; z-index: 1; }
+.affiche-b .aff small { font: 600 12px var(--police); color: #F1E8FF; }
+.affiche-b .sous { display: grid; gap: 10px; padding: 0 16px 16px; }
+.affiche-b .sous b { font: 900 italic 18px/1.1 var(--police); }
+.duo { display: flex; gap: 8px; } .duo span { min-height: 40px; padding: 0 16px; font-size: 13px; }
+.navig { left: 0; right: 0; top: 4%; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); box-shadow: var(--ombre-carte); overflow: hidden; }
+.barre { display: flex; align-items: center; gap: 6px; padding: 9px 12px; background: var(--surface2); border-bottom: 1.5px solid var(--line); }
+.barre i { width: 10px; height: 10px; border-radius: 50%; background: #CBD0DB; } .barre i:first-child { background: var(--rose); }
+.url { margin-left: 8px; flex: 1; min-width: 0; background: var(--surface); border-radius: var(--rond); padding: 3px 12px; font: 500 12px var(--police); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.site { padding: 12px; display: grid; gap: 8px; background: var(--bg); }
+.site-tete { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; border-bottom: 1.5px solid var(--line); padding-bottom: 8px; }
+.site-tete b { font: 900 italic 15px var(--police); } .site-tete span { font: 600 11px var(--police); color: var(--muted); }
+.site .evc { padding: 8px 10px; gap: 10px; box-shadow: none; } .site .evc .ico { width: 34px; height: 34px; } .site .evc b { font-size: 13px; }
+
+.cmd { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 20px; }
+.points { display: flex; gap: 4px; align-items: center; }
+.point { width: 24px; height: 24px; border: 0; padding: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.point::before { content: ""; width: 8px; height: 8px; border-radius: var(--rond); background: #C9CCD3; transition: width .25s, background .25s; }
+.point[aria-selected="true"]::before { width: 26px; background: var(--fg); }
+.point[aria-selected="true"] { width: 34px; }
+.fleches { display: flex; gap: 12px; }
+
+.vers-carte { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 24px auto 0; width: max-content; color: var(--fg); text-decoration: none; font: 900 italic 15px var(--police); }
+.vers-carte .f { width: 48px; height: 48px; border-radius: 50%; background: var(--fg); color: #fff; display: grid; place-items: center; box-shadow: 3px 3px 0 var(--rose); animation: rebond 1.8s ease-in-out infinite; }
+@keyframes rebond { 50% { transform: translateY(5px); } }
+@media (prefers-reduced-motion: reduce) { .vers-carte .f { animation: none; } .point::before { transition: none; } }
+
+@media (min-width: 760px) {
+  .hero { padding-top: 40px; padding-bottom: 32px; }
+  .collage { width: min(100%, 400px); }
+  .affiche-b .aff { font-size: 26px; padding: 22px 18px 40px; }
+}
+/* Deux colonnes (texte à gauche, visuel à droite) dès que la place le permet : tablette en largeur et ordinateur. */
+@media (min-width: 760px) {
+  .slide { grid-template-columns: 1fr 1fr; grid-template-rows: auto; gap: 32px; min-height: 380px; }
+  .collage { justify-self: end; }
+}
+@media (min-width: 1200px) {
+  .slide { gap: 48px; min-height: 420px; }
+  .collage { width: min(100%, 440px); }
+}
+
+/* ---------- Carte des événements ---------- */
+.sec-carte { padding-top: 24px; padding-bottom: 40px; scroll-margin-top: 64px; }
+@media (min-width: 760px) { .sec-carte { scroll-margin-top: 72px; padding-top: 32px; } }
+.barre-carte { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
+.titre-carte { flex: 1 0 100%; margin: 0; font: 900 italic 26px/1.08 var(--police); letter-spacing: -.3px; }
+.recherche { position: relative; flex: 1 1 260px; max-width: 420px; }
+.recherche label { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 18px; background: var(--surface); border: 2px solid var(--fg); border-radius: var(--rond); box-shadow: 3px 3px 0 var(--rose); }
+.recherche svg { width: 20px; height: 20px; flex: none; }
+.recherche input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: 500 16px var(--police); }
+.recherche input::placeholder { color: var(--muted); }
+.suggestions { position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 25; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); box-shadow: 0 10px 28px rgba(17, 17, 17, .14); max-height: 360px; overflow: auto; }
+.suggestions[hidden] { display: none; }
+.suggestions .groupe { padding: 8px 10px 4px; font: 700 12px var(--police); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.suggestions button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 8px 10px; border: 0; border-radius: var(--r-champ); background: none; text-align: left; cursor: pointer; }
+.suggestions button:hover, .suggestions button[aria-selected="true"] { background: var(--bg); }
+.suggestions small { color: var(--muted); }
+.suggestions .vide { padding: 10px; color: var(--muted); font-size: 14px; }
+.puces { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.puce-date { position: relative; }
+.puce-date input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+.ajouter { flex: none; }
+@media (min-width: 1200px) { .ajouter { margin-left: auto; } }
+@media (max-width: 759px) { .ajouter { flex: 1 1 100%; } }
+
+.zone { display: grid; grid-template-columns: 1fr; gap: 24px; }
+.bloc { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); box-shadow: var(--ombre-carte); }
+.carte { position: relative; height: clamp(420px, 70svh, 760px); overflow: hidden; }
+.carte .maplibregl-canvas:focus-visible { outline: 3px solid var(--rose); outline-offset: -3px; }
+.etat-carte { position: absolute; left: 50%; top: 16px; z-index: 3; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 8px 16px; border-radius: var(--rond); background: var(--fg); color: #fff; font: 600 13px/1.3 var(--police); text-align: center; box-shadow: var(--ombre-carte); pointer-events: none; }
+.etat-carte[hidden] { display: none; }
+.boutons-carte { position: absolute; right: 16px; bottom: 32px; z-index: 3; display: grid; gap: 12px; }
+.maplibregl-ctrl-attrib { font: 500 11px var(--police) !important; }
+
+/* La fiche */
+.panneau { position: relative; overflow: auto; overscroll-behavior: contain; }
+.panneau[hidden] { display: none !important; }
+.fermer { position: absolute; top: 16px; right: 16px; z-index: 3; }
+.grande-affiche { position: relative; height: 260px; overflow: hidden; display: grid; align-content: space-between; padding: 24px 22px 60px; color: #fff; font: 900 italic 28px/1.05 var(--police); }
+.grande-affiche::after { content: ""; position: absolute; inset: auto 0 0; height: 55%; background: linear-gradient(transparent, var(--surface)); pointer-events: none; }
+.grande-affiche img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.grande-affiche span, .grande-affiche small { position: relative; z-index: 1; max-width: 80%; overflow-wrap: anywhere; }
+.grande-affiche small { font: 600 13px var(--police); color: rgba(255, 255, 255, .88); }
+.source-image { margin: 0; font-size: 12px; color: var(--muted); }
+.corps { position: relative; z-index: 1; display: grid; gap: 14px; padding: 0 22px 24px; margin-top: -18px; }
+.corps.seul { margin-top: 0; padding-top: 72px; }
+.note-quand { margin: 0; font: 700 13px var(--police); color: var(--rose); }
+.titre-fiche { margin: 0; font: 900 italic 26px/1.08 var(--police); letter-spacing: -.3px; text-wrap: balance; overflow-wrap: anywhere; }
+.tableau { margin: 0; border: 1.5px solid var(--line); border-radius: var(--r-carte); overflow: hidden; }
+.rang { display: grid; grid-template-columns: 104px 1fr; gap: 12px; padding: 13px 16px; }
+.rang + .rang { border-top: 1.5px solid var(--line); }
+.rang dt { color: var(--muted); font: 500 13px/1.5 var(--police); } .rang dd { margin: 0; font: 600 15px/1.45 var(--police); white-space: pre-line; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.desc { margin: 0; font-size: 15px; line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
+.bandeau { margin: 0; padding: 10px 14px; border-radius: var(--r-champ); background: var(--fg); color: #fff; font: 900 italic 15px var(--police); }
+.non-certifie { margin: 0; padding: 12px 14px; border: 1.5px solid var(--line); border-radius: var(--r-champ); background: var(--bg); color: var(--muted); font-size: 14px; }
+.non-certifie b { color: var(--fg); }
+.panneau h4 { margin: 6px 0 0; font: 900 italic 20px/1.1 var(--police); }
+.proches { display: grid; gap: 12px; }
+
+/* Téléphone et tablette en hauteur : la fiche couvre tout l'écran, avec un bouton retour (comme l'écran de l'appli). */
+@media (max-width: 899px) {
+  .panneau { position: fixed; inset: 0; z-index: 50; border: 0; border-radius: 0; box-shadow: none; padding-bottom: env(safe-area-inset-bottom); }
+  .fermer { position: fixed; top: max(16px, env(safe-area-inset-top)); left: 16px; right: auto; }
+  body.fiche-ouverte { overflow: hidden; }
+  .grande-affiche { height: 300px; }
+}
+@media (min-width: 760px) and (max-width: 899px) {
+  .grande-affiche { height: 380px; }
+  .corps { padding-left: 40px; padding-right: 40px; max-width: 760px; margin-left: auto; margin-right: auto; }
+}
+/* Tablette en largeur et ordinateur : carte à gauche, fiche à droite, même hauteur. */
+@media (min-width: 900px) {
+  .zone.ouvert { grid-template-columns: minmax(0, 1.5fr) minmax(360px, 1fr); }
+  .panneau { height: clamp(420px, 70svh, 760px); }
+}
