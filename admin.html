@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://ggubfbpiqmbzakyywezf.supabase.co https://www.odwb.be https://agendabrussels2.imgix.net; connect-src 'self' https://ggubfbpiqmbzakyywezf.supabase.co https://nominatim.openstreetmap.org; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin · Lokal</title>
+<meta name="description" content="Réservé à l'équipe Lokal.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lokal">
+<meta property="og:locale" content="fr_BE">
+<meta property="og:url" content="https://lokalapp.be/admin">
+<meta property="og:title" content="Admin · Lokal">
+<meta property="og:description" content="Réservé à l'équipe Lokal.">
+<meta property="og:image" content="https://lokalapp.be/partage.png">
+<link rel="preload" href="/assets/polices/rubik-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/admin.css">
+
+<script src="/assets/supabase/supabase-2.119.0.js" defer></script>
+<script type="module" src="/assets/admin.js"></script>
+</head>
+<body>
+<!-- Connexion : seulement Google ou Facebook (ils prouvent l'adresse e-mail), comme pour devenir admin dans l'appli. -->
+<main class="connexion-admin" id="ecran-connexion" hidden>
+  <div class="carte-cnx">
+    <img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal.">
+    <p class="kicker">L'équipe Lokal…</p>
+    <h1>Admin</h1>
+    <p class="note">Réservé à l'équipe Lokal. Connecte-toi avec le compte Google ou Facebook de ton adresse d'admin.</p>
+    <button class="btn" type="button" data-fournisseur="google">Continuer avec Google</button>
+    <button class="btn sec" type="button" data-fournisseur="facebook">Continuer avec Facebook</button>
+    <p class="erreur" id="erreur-cnx" role="alert" hidden></p>
+    <p class="note">Une adresse tapée à la main n'est pas vérifiée : elle ne donne jamais accès à l'admin.</p>
+    <a class="note" href="/">Retour au site</a>
+  </div>
+</main>
+
+<main class="connexion-admin" id="ecran-refus" hidden>
+  <div class="carte-cnx">
+    <img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal.">
+    <h1>Pas d'accès</h1>
+    <p class="note" id="texte-refus">Ce compte ne fait pas partie de l'équipe Lokal.</p>
+    <button class="btn sec" type="button" data-deconnexion>Me déconnecter</button>
+    <a class="note" href="/">Retour au site</a>
+  </div>
+</main>
+
+<p class="attente" id="ecran-attente" role="status">Un instant…</p>
+
+<div class="admin" id="ecran-admin" hidden>
+  <header class="tete-admin">
+    <div class="g"><a href="/" aria-label="Lokal, retour au site"><img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal."></a><span class="role" id="role"></span></div>
+    <div class="moi"><span class="nom" id="nom-moi"></span><button class="btn sec petit" type="button" data-deconnexion>Me déconnecter</button></div>
+  </header>
+  <div class="corps">
+    <nav class="menu" aria-label="Parties de l'admin" id="menu">
+      <span class="titre-groupe">À traiter</span>
+      <a class="chip" href="#signalements" data-partie="signalements">Signalements<span class="n" data-n="signalements"></span></a>
+      <a class="chip" href="#messages" data-partie="messages">Messages signalés<span class="n" data-n="messages"></span></a>
+      <a class="chip" href="#non-certifies" data-partie="non-certifies">Non certifiés<span class="n" data-n="non-certifies"></span></a>
+      <a class="chip" href="#retires" data-partie="retires">Retirés<span class="n" data-n="retires"></span></a>
+      <a class="chip" href="#scanner" data-partie="scanner">Scanner un panneau</a>
+      <span class="sep fondateur-seul"></span>
+      <span class="titre-groupe fondateur-seul">Fondateur</span>
+      <a class="chip fondateur-seul" href="#stats" data-partie="stats">Statistiques</a>
+      <a class="chip fondateur-seul" href="#usage" data-partie="usage">Quand Lokal sert le plus</a>
+      <a class="chip fondateur-seul" href="#imports" data-partie="imports">Imports des agendas</a>
+      <a class="chip fondateur-seul" href="#sans-rue" data-partie="sans-rue">Événements sans rue</a>
+      <a class="chip fondateur-seul" href="#alertes" data-partie="alertes">Alertes d'abus<span class="n" data-n="alertes"></span></a>
+      <a class="chip fondateur-seul" href="#equipe" data-partie="equipe">Équipe Lokal</a>
+    </nav>
+    <main class="contenu" id="contenu" tabindex="-1">
+      <section class="partie" id="p-signalements" hidden aria-labelledby="t-sig"><div class="partie-tete"><p class="kicker">À traiter</p><h1 id="t-sig">Signalements</h1>
+        <p class="note">Un signalement arrive ici dès le premier. L'événement n'est masqué qu'à 3 personnes différentes ayant un compte.</p></div><div class="liste" data-liste></div></section>
+
+      <section class="partie" id="p-messages" hidden aria-labelledby="t-msg"><div class="partie-tete"><p class="kicker">À traiter</p><h1 id="t-msg">Messages signalés</h1>
+        <p class="note">« Retirer le message » remplace son texte par « Message retiré par l'équipe Lokal. » chez les deux personnes.</p></div><div class="liste" data-liste></div></section>
+
+      <section class="partie" id="p-non-certifies" hidden aria-labelledby="t-nc"><div class="partie-tete"><p class="kicker">À traiter</p><h1 id="t-nc">Événements non certifiés</h1>
+        <p class="note">Leurs organisateurs ne sont pas encore sur Lokal : de quoi les contacter. Les dates reprises des agendas des communes ont leur propre suivi (Imports).</p></div>
+        <div class="filtres"><input class="champ rond-champ" type="search" id="nc-q" placeholder="Chercher un titre, un organisateur, un village" aria-label="Chercher"><div class="filtres-puces" role="group" aria-label="Origine"><button class="chip actif" type="button" data-origine="" aria-pressed="true">Tous</button><button class="chip" type="button" data-origine="affiche" aria-pressed="false">Affiches scannées</button><button class="chip" type="button" data-origine="import" aria-pressed="false">Importés</button><button class="chip" type="button" data-origine="invite" aria-pressed="false">Publiés par un invité</button></div></div>
+        <div class="bloc tableau-bloc"><table class="tableau"><thead><tr><th>Événement</th><th>Organisateur</th><th>Date</th><th>Village</th><th>Origine</th><th><span class="cache">Actions</span></th></tr></thead><tbody id="nc"></tbody></table></div>
+        <button class="btn sec" type="button" id="nc-plus" hidden>Voir 30 de plus</button></section>
+
+      <section class="partie" id="p-retires" hidden aria-labelledby="t-ret"><div class="partie-tete"><p class="kicker">À traiter</p><h1 id="t-ret">Retirés</h1><p class="note">Pour retrouver un événement retiré et le remettre sur Lokal.</p></div>
+        <div class="bloc tableau-bloc"><table class="tableau"><thead><tr><th>Événement</th><th>Organisateur</th><th>Date</th><th>Retiré le</th><th><span class="cache">Actions</span></th></tr></thead><tbody id="ret"></tbody></table></div></section>
+
+      <section class="partie" id="p-scanner" hidden aria-labelledby="t-scan"><div class="partie-tete"><p class="kicker">L'équipe Lokal…</p><h1 id="t-scan">Scanner un panneau, un texte ou un lien</h1>
+        <p class="note">Comme dans l'appli : l'IA lit les infos, tu vérifies, et chaque événement est publié « non certifié ». Plafond : 30 scans par jour et par personne.</p></div>
+        <div class="grille2">
+          <div class="bloc pad champs"><label class="depot" id="depot-scan"><input type="file" accept="image/jpeg,image/png,image/webp" id="fichier-scan" class="cache"><b>Dépose une photo</b><span class="note">Un panneau, une affiche, ou jusqu'à 4 affiches sur une seule photo.</span><span class="btn sec petit">Choisir une photo</span></label><label class="f"><span class="note">Lien vers la source (facultatif)</span><input class="champ" type="url" id="lien-photo" maxlength="300" placeholder="https://…" autocomplete="off"></label><p class="note">Le lien vers la source s'affiche sur l'événement. Pour une capture d'écran, colle le lien ici avant de choisir la photo.</p></div>
+          <form class="bloc pad champs" id="f-texte" novalidate><label class="f"><span class="et">Ou colle un texte ou un lien</span><textarea class="champ" name="texte" rows="5" maxlength="6000" placeholder="Un post Facebook, le bulletin communal, une page web…"></textarea></label><div class="actions"><button class="btn" type="submit">Lire les infos</button></div></form>
+        </div>
+        <p class="erreur" id="erreur-scan" role="alert" hidden></p>
+        <div class="bloc pad champs" id="resultat-scan" hidden></div>
+      </section>
+
+      <section class="partie" id="p-stats" hidden aria-labelledby="t-stats"><div class="partie-tete"><p class="kicker">Le fondateur…</p><h1 id="t-stats">Statistiques</h1><p class="note">Seulement des nombres : personne n'est reconnaissable ici.</p></div><div data-liste></div></section>
+
+      <section class="partie" id="p-usage" hidden aria-labelledby="t-usage"><div class="partie-tete"><p class="kicker">Le fondateur…</p><h1 id="t-usage">Quand Lokal sert le plus</h1><p class="note">Compteur anonyme des ouvertures de l'appli, sur les 4 dernières semaines (heure belge) : seulement des totaux par heure et par jour, personne n'est reconnaissable.</p></div>
+        <p class="resume" id="resume-usage"></p>
+        <div class="bloc pad"><h2 class="h-bloc">Ouvertures par heure</h2><div class="barres" id="heures" role="img" aria-label="Ouvertures de l'appli par heure de la journée"></div><div class="axe" id="axe-heures"></div></div>
+        <div class="bloc pad"><h2 class="h-bloc">Ouvertures par jour de la semaine</h2><div class="barres" id="jours" role="img" aria-label="Ouvertures de l'appli par jour de la semaine"></div><div class="axe jours" id="axe-jours"></div></div>
+        <div class="bloc pad"><h2 class="h-bloc">Écrans les plus vus</h2><div id="ecrans"></div></div>
+        <details class="bloc pad"><summary>Voir les chiffres en tableau</summary><div id="table-usage"></div></details></section>
+
+      <section class="partie" id="p-imports" hidden aria-labelledby="t-imp"><div class="partie-tete"><p class="kicker">Le fondateur…</p><h1 id="t-imp">Imports des agendas</h1><p class="note">Les événements repris automatiquement des agendas en ligne (toutes les 2 heures et chaque nuit).</p></div><div data-liste></div></section>
+
+      <section class="partie" id="p-sans-rue" hidden aria-labelledby="t-sr"><div class="partie-tete"><p class="kicker">Le fondateur…</p><h1 id="t-sr">Événements sans rue</h1><p class="note">Le repère est au centre du village quand l'adresse n'a pas de rue.</p></div><div data-liste></div></section>
+
+      <section class="partie" id="p-alertes" hidden aria-labelledby="t-al"><div class="partie-tete"><p class="kicker">Le fondateur…</p><h1 id="t-al">Alertes d'abus</h1><p class="note">Alerte à partir de 40 ★ en 7 jours, 5 parrainages (le maximum de la semaine), 20 scans ou 12 présences.</p></div><div class="liste" data-liste></div></section>
+
+      <section class="partie" id="p-equipe" hidden aria-labelledby="t-eq"><div class="partie-tete"><p class="kicker">Le fondateur…</p><h1 id="t-eq">Équipe Lokal</h1><p class="note">Les admins traitent les signalements, les messages signalés, les retraits et les non certifiés. Toi seul gères l'équipe et vois les statistiques.</p></div>
+        <div class="bloc pad" id="membres"></div>
+        <form class="bloc pad champs" id="f-inviter" novalidate><label class="f"><span class="et">Adresse e-mail du nouvel admin</span><span class="invite"><input class="champ" name="email" type="email" maxlength="254" placeholder="prenom@gmail.com" autocomplete="off"><button class="btn" type="submit">Inviter comme admin</button></span></label>
+          <p class="erreur" role="alert" hidden></p><p class="note">Pour la sécurité, l'invitation ne marche qu'avec une connexion Google ou Facebook à cette adresse.</p></form></section>
+    </main>
+  </div>
+</div>
+<div class="bulle" id="bulle" hidden></div>
+<dialog class="fenetre" id="fenetre" aria-labelledby="f-titre"><div class="fenetre-corps" id="fenetre-corps"></div><button class="btn sec petit" type="button" id="fermer-fenetre">Fermer</button></dialog>
+</body>
+</html>

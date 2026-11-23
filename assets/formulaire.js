@@ -1,6 +1,6 @@
 // « Ajouter un événement » sur le site : les mêmes règles que le formulaire de l'appli (src/app/evenement/formulaire.tsx).
 // Fonctions sans écran, testées automatiquement (tests/formulaire.test.mjs).
-import { ajouterJours, isoLocal, chercherLieux } from "./lokal.js";
+import { ajouterJours, isoLocal, chercherLieux, distanceKm } from "./lokal.js";
 
 // Les règles du prototype, dans le même ordre. Renvoie le message et le champ fautif.
 export function verifier(s) {
@@ -53,24 +53,39 @@ export function nouvelleSerie() {
 }
 
 // ---- Position : seulement depuis l'adresse ; sans rue (ou rue introuvable), le centre du village ----
-// OpenStreetMap (Nominatim) : une seule recherche, au moment de publier, jamais pendant la frappe.
+// OpenStreetMap (Nominatim), règles d'usage respectées : seulement au moment de publier (jamais pendant la frappe),
+// et une recherche par seconde au plus, même quand l'équipe publie plusieurs affiches d'un coup.
 const NOMINATIM = "https://nominatim.openstreetmap.org/search";
+let derniere = 0;
+export const oublierDerniereRecherche = () => {
+  derniere = 0; // pour les tests automatiques
+};
+async function patienter() {
+  const attente = derniere + 1100 - Date.now();
+  if (attente > 0) await new Promise((r) => setTimeout(r, attente));
+  derniere = Date.now();
+}
+async function demander(params, fetcher) {
+  const q = new URLSearchParams({ format: "jsonv2", countrycodes: "be", limit: "1", ...params });
+  await patienter();
+  const r = await fetcher(`${NOMINATIM}?${q}`, { headers: { "Accept-Language": "fr" } });
+  if (!r.ok) return null;
+  const d = await r.json();
+  if (!Array.isArray(d) || !d.length) return null;
+  const lat = Number(d[0].lat), lng = Number(d[0].lon);
+  const ad = d[0].address ?? {};
+  return Number.isFinite(lat) && Number.isFinite(lng)
+    ? { lat, lng, genre: d[0].category ?? "", rue: ad.road ?? "", numero: ad.house_number ?? "", codePostal: ad.postcode ?? "" }
+    : null;
+}
+
 export async function positionDepuisAdresse(a, lieux, fetcher = fetch) {
   const village = a.village.trim();
   if (!village) return null;
-  const demander = async (params) => {
-    const q = new URLSearchParams({ format: "jsonv2", countrycodes: "be", limit: "1", ...params });
-    const r = await fetcher(`${NOMINATIM}?${q}`, { headers: { "Accept-Language": "fr" } });
-    if (!r.ok) return null;
-    const d = await r.json();
-    if (!Array.isArray(d) || !d.length) return null;
-    const lat = Number(d[0].lat), lng = Number(d[0].lon);
-    return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
-  };
   if (a.rue && a.rue.trim()) {
     try {
-      const p = await demander({ street: `${a.numero ? a.numero.trim() + " " : ""}${a.rue.trim()}`, city: village, ...(a.codePostal ? { postalcode: a.codePostal.trim() } : {}) });
-      if (p) return { ...p, precision: "adresse" };
+      const p = await demander({ street: `${a.numero ? a.numero.trim() + " " : ""}${a.rue.trim()}`, city: village, ...(a.codePostal ? { postalcode: a.codePostal.trim() } : {}) }, fetcher);
+      if (p) return { lat: p.lat, lng: p.lng, precision: "adresse" };
     } catch {
       // pas de réseau : centre du village
     }
@@ -78,10 +93,31 @@ export async function positionDepuisAdresse(a, lieux, fetcher = fetch) {
   const v = chercherLieux(village, lieux, 1)[0];
   if (v) return { lat: v.lat, lng: v.lng, precision: "village" };
   try {
-    const p = await demander({ city: village, ...(a.codePostal ? { postalcode: a.codePostal.trim() } : {}) });
-    if (p) return { ...p, precision: "village" };
+    const p = await demander({ city: village, ...(a.codePostal ? { postalcode: a.codePostal.trim() } : {}) }, fetcher);
+    if (p) return { lat: p.lat, lng: p.lng, precision: "village" };
   } catch {
     // rien
+  }
+  return null;
+}
+
+// Une affiche qui donne seulement le nom de la salle (sans rue) : on cherche la salle près du village
+// (10 km au plus), comme l'appli. « Palais des Congrès et cinémas » : on essaie aussi « Palais des Congrès ».
+export function variantesSalle(nom) {
+  const entier = nom.trim().replace(/\s+/g, " ");
+  const court = entier.split(/\s+(?:et|&|-|–|\/)\s+|[,(]/i)[0].trim();
+  return [entier, court].filter((v, i, t) => v.length >= 3 && t.indexOf(v) === i);
+}
+export async function adresseDuLieu(nom, village, fetcher = fetch) {
+  for (const salle of variantesSalle(nom)) {
+    try {
+      const r = await demander({ q: `${salle}, ${village.nom}`, addressdetails: "1" }, fetcher);
+      if (!r || r.genre === "place" || r.genre === "boundary" || r.genre === "highway") continue;
+      if (distanceKm(village, r) > 10) continue;
+      return { lat: r.lat, lng: r.lng, rue: r.rue, numero: r.numero, codePostal: r.codePostal };
+    } catch {
+      return null; // pas de réseau : inutile d'essayer la suite
+    }
   }
   return null;
 }
