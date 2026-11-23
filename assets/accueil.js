@@ -22,12 +22,7 @@ function ico(cat, petit) {
   return s;
 }
 
-// Les icônes des visuels du carrousel : les vraies icônes de l'appli.
-document.querySelectorAll("[data-icone]").forEach((n) => {
-  const cat = n.getAttribute("data-icone");
-  n.style.background = CATEGORIES[cat].couleur;
-  n.innerHTML = svgIcone(cat);
-});
+// Les icônes des visuels (data-icone) et « Remonter en haut » : voir page.js, commun à toutes les pages.
 
 // ================= Carrousel =================
 const piste = $("#piste");

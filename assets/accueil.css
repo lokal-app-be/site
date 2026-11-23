@@ -12,6 +12,7 @@
 .slide h1, .slide h2 { margin: 0; font: 900 italic clamp(30px, 4.6vw, 48px)/1.08 var(--police); letter-spacing: -.5px; text-wrap: balance; }
 .slide h1 em, .slide h2 em { color: var(--rose); font-style: italic; }
 .texte p { margin: 0; color: var(--muted); font-size: 16px; max-width: 28rem; }
+.texte .kicker { color: var(--rose); font-size: 13px; }
 .boutons { display: flex; flex-wrap: wrap; gap: 12px; }
 .etapes { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; counter-reset: e; color: var(--muted); font-size: 16px; }
 .etapes li { counter-increment: e; display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: baseline; }
@@ -24,17 +25,8 @@
 .photo { left: 0; top: 0; width: 86%; border: 1.5px solid var(--line); border-radius: var(--r-carte); overflow: hidden; box-shadow: var(--ombre-carte); background: var(--surface); }
 .photo img { width: 100%; height: auto; }
 .collage .c2 { right: 0; bottom: 4%; width: 78%; }
-.tel { left: 50%; top: 0; width: 56%; height: 100%; transform: translateX(-50%); background: var(--fg); border-radius: 40px; padding: 8px; box-shadow: var(--ombre-carte); }
-.ecran { position: relative; width: 100%; height: 100%; border-radius: 32px; overflow: hidden; background: #EFEFEC; }
-.ecran img { position: absolute; left: 50%; top: 0; height: 100%; width: auto; max-width: none; transform: translateX(-50%); }
-.ecran .puces { position: absolute; top: 14px; left: 10px; right: 10px; display: flex; gap: 6px; }
 .chip { display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: var(--rond); border: 1.5px solid var(--line); background: var(--surface); color: var(--fg); font: 600 13px/1 var(--police); white-space: nowrap; cursor: pointer; }
 .chip.actif { background: var(--fg); border-color: var(--fg); color: #fff; font: 900 italic 13px/1 var(--police); box-shadow: 3px 3px 0 var(--rose); }
-.ecran .chip { height: 30px; padding: 0 10px; font-size: 11px; box-shadow: none; }
-.ecran .evc { position: absolute; left: 8px; right: 8px; bottom: 10px; width: auto; padding: 10px; gap: 8px; }
-.ecran .evc .ico { width: 34px; height: 34px; }
-.ecran .evc b { font-size: 13px; }
-.pastille-gr { left: 0; top: 14%; z-index: 2; font: 900 italic 15px/1 var(--police); background: var(--rose); color: #fff; border-radius: var(--rond); padding: 10px 16px; }
 .affiche-b { left: 6%; right: 6%; top: 0; bottom: 0; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); overflow: hidden; box-shadow: var(--ombre-carte); display: grid; grid-template-rows: 1fr auto; }
 .affiche-b .aff { position: relative; display: grid; align-content: space-between; padding: 16px 14px 34px; color: #fff; font: 900 italic 21px/1.05 var(--police); background: linear-gradient(160deg, #B98CFF, #5A2AC0); }
 .affiche-b .aff::after { content: ""; position: absolute; inset: auto 0 0; height: 60%; background: linear-gradient(transparent, var(--surface)); }
@@ -42,6 +34,20 @@
 .affiche-b .aff small { font: 600 12px var(--police); color: #F1E8FF; }
 .affiche-b .sous { display: grid; gap: 10px; padding: 0 16px 16px; }
 .affiche-b .sous b { font: 900 italic 18px/1.1 var(--police); }
+/* Slide « Installe Lokal » : la vraie carte de l'appli à ses vraies proportions (sans contour de téléphone) + rond « Gratuit ». */
+.capture { left: 50%; top: 0; height: 100%; aspect-ratio: 480 / 700; transform: translateX(-50%); border-radius: var(--r-carte); overflow: hidden; border: 1.5px solid var(--line); background: #EFEFEC; box-shadow: 6px 6px 0 var(--fg); }
+.capture img { width: 100%; height: 100%; object-fit: cover; }
+.rond-gratuit { left: 0; top: 34%; z-index: 2; width: 132px; height: 132px; border-radius: 50%; background: var(--rose); color: #fff; display: grid; place-content: center; text-align: center; gap: 4px; box-shadow: 4px 4px 0 var(--fg); }
+.rond-gratuit b { font: 900 italic 28px/1 var(--police); }
+.rond-gratuit small { font: 700 11px/1.2 var(--police); padding: 0 14px; }
+@media (max-width: 759px) { .rond-gratuit { width: 108px; height: 108px; } .rond-gratuit b { font-size: 23px; } .rond-gratuit small { font-size: 10px; } }
+/* QR codes : floutés et sans lien jusqu'à la sortie sur les stores. */
+.qrs { display: flex; gap: 16px; flex-wrap: wrap; }
+.qr { display: grid; justify-items: center; gap: 2px; padding: 12px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); box-shadow: var(--ombre-carte); }
+.qr-img { position: relative; width: 104px; height: 104px; }
+.qr-img img { width: 100%; height: 100%; opacity: .3; filter: blur(2.5px); }
+.qr-voile { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; font: 700 12px/1.2 var(--police); color: var(--fg); padding: 8px; }
+.qr b { font: 900 italic 14px var(--police); margin-top: 6px; } .qr small { color: var(--muted); font-size: 12px; }
 .duo { display: flex; gap: 8px; } .duo span { min-height: 40px; padding: 0 16px; font-size: 13px; }
 .navig { left: 0; right: 0; top: 4%; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); box-shadow: var(--ombre-carte); overflow: hidden; }
 .barre { display: flex; align-items: center; gap: 6px; padding: 9px 12px; background: var(--surface2); border-bottom: 1.5px solid var(--line); }
@@ -81,7 +87,7 @@
 }
 
 /* ---------- Carte des événements ---------- */
-.sec-carte { padding-top: 24px; padding-bottom: 40px; scroll-margin-top: 64px; }
+.sec-carte { padding-top: 24px; padding-bottom: 40px; scroll-margin-top: 0; }
 @media (min-width: 760px) { .sec-carte { scroll-margin-top: 72px; padding-top: 32px; } }
 .barre-carte { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
 .titre-carte { flex: 1 0 100%; margin: 0; font: 900 italic 26px/1.08 var(--police); letter-spacing: -.3px; }
@@ -100,8 +106,8 @@
 .puces { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .puce-date { position: relative; }
 .puce-date input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-.ajouter { flex: none; }
-@media (min-width: 1200px) { .ajouter { margin-left: auto; } }
+.ajouter { flex: none; min-height: 48px; }
+@media (min-width: 900px) { .ajouter { margin-left: auto; } }
 @media (max-width: 759px) { .ajouter { flex: 1 1 100%; } }
 
 .zone { display: grid; grid-template-columns: 1fr; gap: 24px; }

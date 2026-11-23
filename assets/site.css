@@ -37,8 +37,16 @@ a { color: var(--rose); }
 .nav { display: flex; align-items: center; gap: 24px; font: 600 15px var(--police); }
 .nav a { color: var(--fg); text-decoration: none; }
 .nav a:hover { color: var(--rose); }
-.nav .lien { display: none; }
-@media (min-width: 760px) { .nav .lien { display: inline; } .marque img { height: 38px; } .tete { min-height: 72px; } }
+/* Téléphone : le logo et « Bientôt » sur la 1re ligne, les liens du menu sur une 2e ligne. */
+@media (max-width: 759px) {
+  .tete { position: relative; flex-wrap: wrap; justify-content: flex-start; row-gap: 0; padding-top: 10px; }
+  .marque { margin-right: auto; }
+  .nav { display: contents; }
+  .nav .bientot { order: 1; }
+  .tete::after { content: ""; order: 2; flex-basis: 100%; }
+  .nav .lien { order: 3; display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; margin-right: 18px; }
+}
+@media (min-width: 760px) { .marque img { height: 38px; } .tete { min-height: 72px; } }
 
 /* ---------- Boutons et pastilles (pièces de l'appli) ---------- */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 24px; border-radius: var(--rond); border: 2px solid var(--fg); background: var(--fg); color: #fff; box-shadow: 3px 3px 0 var(--rose); font: 900 italic 15px/1 var(--police); text-decoration: none; white-space: nowrap; cursor: pointer; }
@@ -80,6 +88,10 @@ button.evc { cursor: pointer; } button.evc:hover { border-color: var(--fg); }
 .pied li a:hover { color: var(--rose); }
 .pied li span { color: var(--muted); }
 .bas { margin-top: 40px; padding-top: 18px; border-top: 1.5px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; font-size: 13px; color: var(--muted); }
+.bas { align-items: center; }
+.haut { display: inline-flex; align-items: center; gap: 12px; border: 0; background: none; cursor: pointer; padding: 0; font: 700 14px var(--police); color: var(--fg); }
+.haut .rond { width: 44px; height: 44px; }
+.haut:hover { color: var(--rose); }
 @media (min-width: 760px) { .pied-grille { grid-template-columns: repeat(2, 1fr); } }
 @media (min-width: 1200px) { .pied-grille { grid-template-columns: 1.4fr 1fr 1fr 1fr; } }
 

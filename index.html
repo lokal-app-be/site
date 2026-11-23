@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="/assets/maplibre/maplibre-gl.css">
 <link rel="stylesheet" href="/assets/accueil.css">
 <script src="/assets/maplibre/maplibre-gl-csp.js" defer></script>
+<script type="module" src="/assets/page.js"></script>
 <script type="module" src="/assets/accueil.js"></script>
 </head>
 <body>
@@ -33,8 +34,8 @@
   <a class="marque" href="/" aria-label="Lokal, accueil"><img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal."></a>
   <nav class="nav" aria-label="Menu">
     <a class="lien" href="#carte">La carte</a>
-    <a class="lien" href="#organisateurs" data-diapo="2">Organisateurs</a>
-    <a class="lien" href="#communes" data-diapo="3">Communes et salles</a>
+    <a class="lien" href="/organisateurs">Organisateurs</a>
+    <a class="lien" href="/communes">Communes et salles</a>
     <span class="bientot petit">Bientôt sur Android et iPhone</span>
   </nav>
 </header>
@@ -58,18 +59,22 @@
 
     <article class="slide" aria-roledescription="diapositive" aria-label="2 sur 4">
       <div class="texte">
-        <p class="kicker">C'est gratuit !</p>
-        <h2>Installe Lokal <em>en une minute</em></h2>
+        <p class="kicker">En une minute…</p>
+        <h2>Installe Lokal, <em>c'est gratuit</em></h2>
         <ol class="etapes">
-          <li>Cherche « Lokal » dans le Play Store ou l'App Store.</li>
+          <li>Scanne le QR avec ton téléphone, ou cherche « Lokal » dans le Play Store ou l'App Store.</li>
           <li>Ouvre l'appli : la carte s'affiche tout de suite.</li>
           <li>Autorise ta position, ou choisis ton village.</li>
         </ol>
-        <div class="boutons"><span class="bientot">Bientôt sur Android et iPhone</span></div>
+        <!-- Les QR codes restent floutés et sans lien tant que l'appli n'est pas sur les stores (règle d'Arnaud). -->
+        <div class="qrs">
+          <div class="qr"><div class="qr-img"><img src="/assets/images/qr-attente.svg" width="104" height="104" alt=""><span class="qr-voile">Actif au lancement</span></div><b>Google Play</b><small>Android</small></div>
+          <div class="qr"><div class="qr-img"><img src="/assets/images/qr-attente.svg" width="104" height="104" alt=""><span class="qr-voile">Actif au lancement</span></div><b>App Store</b><small>iPhone</small></div>
+        </div>
       </div>
       <div class="collage" aria-hidden="true">
-        <div class="tel"><div class="ecran"><img src="/assets/images/carte-tellin.webp" width="640" height="500" alt=""><div class="puces"><span class="chip">Aujourd'hui</span><span class="chip actif">Ce week-end</span></div><div class="evc"><span class="ico" data-icone="fete"></span><div class="evc-t"><div class="pills"><span class="pdate">VEN. · 21:00</span><span class="certif">✓ Certifié</span></div><b>Soirée Halloween</b><small>Salle de Tellin · 0,4 km</small></div></div></div></div>
-        <span class="pastille-gr">Gratuit</span>
+        <div class="capture"><img src="/assets/images/appli-carte.webp" width="480" height="700" alt=""></div>
+        <div class="rond-gratuit"><b>Gratuit</b><small>Android et iPhone</small></div>
       </div>
     </article>
 
@@ -77,8 +82,8 @@
       <div class="texte">
         <p class="kicker">Bal, souper, tournoi…</p>
         <h2>Mets ton événement <em>en avant</em></h2>
-        <p>Bal, souper, tournoi, concert : publie-le depuis l'appli en une minute. Il apparaît sur la carte, marqué « Certifié », avec ton affiche.</p>
-        <div class="boutons"><span class="bientot">Bientôt sur Android et iPhone</span></div>
+        <p>Bal, souper, tournoi, concert : publie-le depuis le site ou l'appli, en une minute. Il apparaît sur la carte, marqué « Certifié », avec ton affiche.</p>
+        <div class="boutons"><a class="btn" href="/organisateurs">Comment ajouter mon événement</a></div>
       </div>
       <div class="collage" aria-hidden="true">
         <div class="affiche-b"><div class="aff"><span>Trail nocturne à la frontale</span><small>Sam. · 18:30 · Place de Resteigne</small></div>
@@ -91,8 +96,8 @@
       <div class="texte">
         <p class="kicker">Commune, salle, professionnel ?</p>
         <h2>Votre agenda Lokal <em>sur votre site web</em></h2>
-        <p>Demandez votre calendrier, à ajouter directement sur votre site. Vos événements y sont toujours à jour, sans rien recopier.</p>
-        <div class="boutons"><a class="btn" href="mailto:contact@lokalapp.be?subject=Un%20calendrier%20Lokal%20pour%20notre%20site">Demander mon calendrier</a></div>
+        <p>Un agenda Lokal à ajouter directement sur votre site. Vos événements y sont toujours à jour, sans rien recopier.</p>
+        <div class="boutons"><a class="btn" href="/communes">Voir le module</a><a class="btn sec" href="mailto:contact@lokalapp.be?subject=Demande%20de%20devis%20%3A%20agenda%20Lokal%20sur%20notre%20site">Demander un devis</a></div>
         <p class="adresse">ou écrivez à <b>contact@lokalapp.be</b></p>
       </div>
       <div class="collage" aria-hidden="true">
@@ -136,7 +141,7 @@
       <button type="button" class="chip actif" data-mode="weekend" aria-pressed="true">Ce week-end</button>
       <span class="puce-date"><button type="button" class="chip" data-mode="date" aria-pressed="false" id="puce-date" tabindex="-1">Autre date</button><input type="date" id="autre-date" aria-label="Choisir une autre date"></span>
     </div>
-    <span class="bientot ajouter">+ Ajouter un événement · bientôt</span>
+    <a class="btn ajouter" href="/ajouter">+ Ajouter un événement</a>
   </div>
 
   <div class="zone" id="zone">
@@ -157,11 +162,11 @@
       <img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal.">
       <p>Ton agenda Lokal dans ta poche. Toutes les sorties autour de toi, en Belgique.</p>
     </div>
-    <div><h2>L'appli</h2><ul><li><span>Bientôt sur Android et iPhone</span></li><li><a href="#carte">La carte</a></li></ul></div>
-    <div><h2>Organisateurs</h2><ul><li><a href="#organisateurs" data-diapo="2">Publier un événement</a></li><li><a href="#communes" data-diapo="3">Communes et salles</a></li><li><a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a></li></ul></div>
+    <div><h2>L'appli</h2><ul><li><span>Bientôt sur Android et iPhone</span></li><li><a href="/#carte">La carte</a></li></ul></div>
+    <div><h2>Organisateurs</h2><ul><li><a href="/ajouter">Ajouter un événement</a></li><li><a href="/organisateurs">Comment ça marche</a></li><li><a href="/communes">Communes et salles</a></li><li><a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a></li></ul></div>
     <div><h2>Infos</h2><ul><li><a href="/mentions-legales">Mentions légales</a></li><li><a href="/confidentialite">Confidentialité</a></li><li><a href="/conditions">Conditions d'utilisation</a></li><li><a href="/supprimer-compte">Supprimer mon compte</a></li></ul></div>
   </div>
-  <div class="bas"><span>© 2026 Lokal · Carte © contributeurs OpenStreetMap</span><span>Fait à Tellin, pour toute la Belgique</span></div>
+  <div class="bas"><span>© 2026 Lokal · Carte © contributeurs OpenStreetMap</span><button class="haut" id="haut" type="button"><span class="rond petit" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></span>Remonter en haut</button></div>
 </footer>
 
 </body>
