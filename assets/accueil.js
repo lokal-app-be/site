@@ -1,8 +1,8 @@
 // Accueil de lokalapp.be : le carrousel, puis la carte des événements (MapLibre + OpenFreeMap) et la fiche d'un événement.
 import {
-  SUPABASE_URL, SUPABASE_CLE, TELLIN, CATEGORIES, COLONNES, svgIcone, depuisLigne, ecarter, positionUtilisable,
+  SUPABASE_URL, SUPABASE_CLE, TELLIN, CATEGORIES, COLONNES, svgIcone, depuisLigne, ecarter,
   aujourdhuiBelgique, periode, dansPeriode, pastilleDate, bientot, formatJour, texteEntree, texteQuand,
-  adresseComplete, distanceKm, formatKm, lireLieux, chercherLieux, libelleLieu,
+  adresseComplete, distanceKm, lireLieux, chercherLieux, libelleLieu,
 } from "./lokal.js";
 
 const doux = !matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -78,7 +78,6 @@ const aujourdhui = aujourdhuiBelgique();
 let mode = "weekend";
 let dateChoisie = null;
 let evenements = [];
-let position = null; // seulement si la personne touche « Autour de moi »
 let selection = null;
 let horsPeriode = null; // événement ouvert depuis la recherche, en dehors de la période : montré seul sur la carte
 let carte = null;
@@ -184,10 +183,9 @@ async function demarrerCarte() {
   carte = new ml.Map({
     container: "map",
     style: prep.style,
-    // Jamais Bruxelles : Tellin tant que la personne ne donne pas sa position. À l'arrivée, la carte est dézoomée
-    // (demande d'Arnaud du 24 nov. 2026) : la même zone autour de Tellin sur chaque écran (environ 18 km
-    // à l'est et à l'ouest, 15 km au nord et au sud), de Rochefort à Saint-Hubert.
-    bounds: [[TELLIN.lng - 0.25, TELLIN.lat - 0.14], [TELLIN.lng + 0.25, TELLIN.lat + 0.14]],
+    // Jamais Bruxelles. À l'arrivée, la carte montre la Wallonie (vue choisie par Arnaud le 24 nov. 2026) :
+    // de Mons à Eupen et Saint-Vith, de Wavre à Libramont. Tellin est dedans. Même zone sur chaque écran.
+    bounds: [[3.85, 49.88], [6.25, 50.78]],
     minZoom: 7,
     maxZoom: 18,
     maxBounds: [[1.6, 48.9], [7.4, 52.1]],
@@ -444,8 +442,7 @@ function ouvrirFiche(e, { deplacer, depuisGroupe = false }) {
   corps.append(titre);
 
   const dl = el("dl", "tableau");
-  const loin = position ? ` · ${formatKm(distanceKm(position, e))}` : "";
-  rang(dl, "Lieu", e.adresseCachee ? `Secteur ${e.village} (adresse cachée)` : `${e.lieu ? `${e.lieu}, ` : ""}${adresseComplete(e)}${loin}`);
+  rang(dl, "Lieu", e.adresseCachee ? `Secteur ${e.village} (adresse cachée)` : `${e.lieu ? `${e.lieu}, ` : ""}${adresseComplete(e)}`);
   const quand = texteQuand(e);
   if (quand) rang(dl, "Quand", quand);
   rang(dl, "Entrée", texteEntree(e));
@@ -534,7 +531,7 @@ champDate.addEventListener("change", () => {
 });
 champDate.addEventListener("click", () => champDate.showPicker && champDate.showPicker());
 
-// ================= Autour de moi =================
+// ================= Zoom =================
 // Boutons + et − (demande d'Arnaud, 24 nov. 2026) : même pas de zoom que la molette, grisés aux limites.
 function majZoom() {
   if (!carte) return;
@@ -547,28 +544,6 @@ function majZoom() {
 }
 $("#zoom-plus").addEventListener("click", () => carte?.zoomIn({ duration: doux ? 300 : 0 }));
 $("#zoom-moins").addEventListener("click", () => carte?.zoomOut({ duration: doux ? 300 : 0 }));
-
-$("#ma-position").addEventListener("click", () => {
-  if (!navigator.geolocation) return etat("Ta position n'est pas disponible sur ce navigateur.");
-  const dire = (texte) => {
-    etat(texte);
-    setTimeout(() => etat(""), 7000);
-  };
-  // Position précise et récente (bug du 24 nov. 2026 : à Rochefort, la carte partait vers Louvain). Sans précision,
-  // le navigateur peut donner une position devinée par le réseau, ou une ancienne position gardée en mémoire.
-  navigator.geolocation.getCurrentPosition(
-    (p) => {
-      const { latitude: lat, longitude: lng, accuracy } = p.coords;
-      const precision = positionUtilisable(lat, lng, accuracy);
-      if (precision === "hors") return dire("Ta position est en dehors de la Belgique : la carte ne bouge pas. Tu peux chercher ton village.");
-      if (precision === "floue") return dire(`Ta position n'est pas assez précise (à environ ${Math.round(accuracy / 1000)} km près). Active la localisation précise, ou cherche ton village.`);
-      position = { lat, lng };
-      if (carte) carte.flyTo({ center: [lng, lat], zoom: 13.5, duration: doux ? 900 : 0 });
-    },
-    () => dire("Position refusée ou introuvable : la carte ne bouge pas. Tu peux chercher ton village."),
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
-  );
-});
 
 // ================= Recherche (villages et événements) =================
 const champ = $("#q");
