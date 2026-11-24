@@ -44,8 +44,13 @@ a { color: var(--rose); }
   .nav { display: contents; }
   .nav .bientot { order: 1; }
   .tete::after { content: ""; order: 2; flex-basis: 100%; }
-  .nav .lien { order: 3; display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; margin-right: 8px; }
+  .nav .lien { order: 3; display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
+  .nav .lien-compte { order: 1; }
 }
+/* Le bouton du compte est toujours dans l'en-tête. « Bientôt sur Android et iPhone » y reste quand il y a la place
+   (ordinateur) ; sur téléphone et tablette, il est dans le pied de page et dans la page. */
+.nav .lien-compte { flex: none; }
+@media (max-width: 1099px) { .tete .nav .bientot { display: none; } }
 @media (min-width: 760px) { .marque img { height: 38px; } .tete { min-height: 72px; } }
 
 /* ---------- Boutons et pastilles (pièces de l'appli) ---------- */
