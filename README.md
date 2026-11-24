@@ -8,6 +8,7 @@ rien n'y arrive sans l'accord écrit d'Arnaud dans le fil du site.
 - `index.html` : accueil (carrousel, carte des événements, fiche d'un événement).
 - `organisateurs.html`, `communes.html` : pour les organisateurs, et pour les communes et les salles (sur devis).
 - `ajouter.html` : ajouter un événement depuis le site, avec son compte Lokal (le même que dans l'appli).
+- `compte.html` : « Mon compte » (bouton « Se connecter » en haut de chaque page) : profil, mes événements publiés, se déconnecter, supprimer son compte, lien vers l'Admin pour l'équipe.
 - `admin.html` : Admin Lokal et page Fondateur, réservés à l'équipe (la base vérifie le rôle à chaque lecture).
 - `conditions.html`, `confidentialite.html`, `mentions-legales.html`, `supprimer-compte.html` : pages légales
   (`/supprimer-compte` est demandée par Google Play : ne jamais la casser).

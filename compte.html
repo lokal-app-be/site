@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://ggubfbpiqmbzakyywezf.supabase.co; connect-src 'self' https://ggubfbpiqmbzakyywezf.supabase.co; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="robots" content="noindex">
+<title>Mon compte · Lokal</title>
+<meta name="description" content="Ton compte Lokal sur le site : ton profil, tes événements publiés, te déconnecter ou supprimer ton compte.">
+<link rel="canonical" href="https://lokalapp.be/compte">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lokal">
+<meta property="og:locale" content="fr_BE">
+<meta property="og:url" content="https://lokalapp.be/compte">
+<meta property="og:title" content="Mon compte · Lokal">
+<meta property="og:description" content="Ton compte Lokal sur le site : ton profil, tes événements publiés, te déconnecter ou supprimer ton compte.">
+<meta property="og:image" content="https://lokalapp.be/partage.png">
+<link rel="preload" href="/assets/polices/rubik-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/pages.css">
+<link rel="stylesheet" href="/assets/ajouter.css">
+<link rel="stylesheet" href="/assets/compte.css">
+<script src="/assets/supabase/supabase-2.119.0.js" defer></script>
+<script type="module" src="/assets/page.js"></script>
+<script type="module" src="/assets/moncompte.js"></script>
+</head>
+<body>
+
+<header class="tete cadre">
+  <a class="marque" href="/" aria-label="Lokal, accueil"><img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal."></a>
+  <nav class="nav" aria-label="Menu">
+    <a class="lien" href="/#carte">La carte</a>
+    <a class="lien" href="/organisateurs">Organisateurs</a>
+    <a class="lien" href="/communes">Communes et salles</a>
+    <span class="bientot petit">Bientôt sur Android et iPhone</span>
+    <a class="btn sec petit lien-compte" href="/compte" id="lien-compte" aria-current="page">Se connecter</a>
+  </nav>
+</header>
+
+<main class="page cadre">
+<div class="page-tete">
+  <p class="kicker">Ton compte Lokal</p>
+  <h1>Mon compte</h1>
+  <p class="intro">Le même compte que dans l'appli.</p>
+</div>
+<div class="compte-grille" id="mon-compte">
+  <p class="bloc chargement" id="chargement" role="status">Un instant…</p>
+
+  <!-- 1. Connexion (le même compte que dans l'appli) -->
+  <section class="bloc carte-compte" id="connexion" hidden aria-labelledby="t-cnx">
+    <h2 class="cs-titre" id="t-cnx">Connecte-toi</h2>
+    <p class="intro">Avec ton compte Lokal, le même que dans l'appli.</p>
+    <div class="cs-boutons"><button class="btn" type="button" data-fournisseur="google">Continuer avec Google</button><button class="btn sec" type="button" data-fournisseur="facebook">Continuer avec Facebook</button></div>
+    <p class="ou"><span>ou avec ton e-mail</span></p>
+    <form class="champs" id="f-cnx" novalidate>
+      <label class="f"><span>E-mail</span><input class="champ" name="email" type="email" autocomplete="email" maxlength="80" required></label>
+      <label class="f"><span>Mot de passe</span><input class="champ" name="mdp" type="password" autocomplete="current-password" maxlength="72" required></label>
+      <p class="erreur" role="alert" hidden></p>
+      <div class="f-bas"><button class="btn" type="submit">Me connecter</button><button class="lien-btn" type="button" data-vers="oubli">Mot de passe oublié ?</button></div>
+    </form>
+    <p class="note-f">Pas encore de compte ? <button class="lien-btn" type="button" data-vers="creer">Crée-le ici en une minute</button></p>
+  </section>
+
+  <!-- 2. Créer un compte -->
+  <section class="bloc carte-compte" id="creer" hidden aria-labelledby="t-creer">
+    <h2 class="cs-titre" id="t-creer">Crée ton compte</h2>
+    <form class="champs" id="f-creer" novalidate>
+      <div class="f-ligne"><label class="f"><span>Prénom</span><input class="champ" name="prenom" maxlength="24" autocomplete="given-name"></label><label class="f"><span>Nom</span><input class="champ" name="nom" maxlength="30" autocomplete="family-name"></label></div>
+      <p class="note-f">Ton prénom et ton nom restent privés. Les autres voient ton pseudo, ou ton prénom et l'initiale de ton nom.</p>
+      <label class="f"><span>Pseudo (facultatif)</span><input class="champ" name="pseudo" maxlength="24" autocomplete="off" placeholder="ex. : lulu_bure"></label>
+      <label class="f"><span>E-mail</span><input class="champ" name="email" type="email" maxlength="80" autocomplete="email" placeholder="toi@exemple.be"></label>
+      <label class="f"><span>Mot de passe</span><input class="champ" name="mdp" type="password" maxlength="72" autocomplete="new-password" placeholder="8 caractères minimum"></label>
+      <p class="note-f">Lokal est ouvert dès 13 ans. En créant ton compte, tu acceptes les <a href="/conditions" target="_blank" rel="noopener">conditions d'utilisation</a> et la <a href="/confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</p>
+      <p class="erreur" role="alert" hidden></p>
+      <div class="f-bas"><button class="btn" type="submit">Créer mon compte</button><button class="lien-btn" type="button" data-vers="connexion">J'ai déjà un compte</button></div>
+    </form>
+  </section>
+
+  <!-- 3. Code reçu par e-mail -->
+  <section class="bloc carte-compte" id="code" hidden aria-labelledby="t-code">
+    <h2 class="cs-titre" id="t-code">Confirme ton e-mail</h2>
+    <p class="intro">On t'a envoyé un code à 6 chiffres. Regarde aussi dans les indésirables.</p>
+    <form class="champs" id="f-code" novalidate>
+      <label class="f"><span>Code reçu par e-mail</span><input class="champ code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
+      <p class="erreur" role="alert" hidden></p>
+      <div class="f-bas"><button class="btn" type="submit">Confirmer</button><button class="lien-btn" type="button" id="renvoyer">Renvoyer un code</button><button class="lien-btn" type="button" data-vers="creer">Changer d'e-mail</button></div>
+    </form>
+  </section>
+
+  <!-- 4. Mot de passe oublié -->
+  <section class="bloc carte-compte" id="oubli" hidden aria-labelledby="t-oubli">
+    <h2 class="cs-titre" id="t-oubli">Mot de passe oublié</h2>
+    <form class="champs" id="f-oubli" novalidate>
+      <label class="f"><span>E-mail de ton compte</span><input class="champ" name="email" type="email" maxlength="80" autocomplete="email"></label>
+      <div class="oubli-suite" hidden>
+        <label class="f"><span>Code reçu par e-mail</span><input class="champ code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
+        <label class="f"><span>Nouveau mot de passe</span><input class="champ" name="mdp" type="password" maxlength="72" autocomplete="new-password" placeholder="8 caractères minimum"></label>
+      </div>
+      <p class="erreur" role="alert" hidden></p>
+      <div class="f-bas"><button class="btn" type="submit">Recevoir un code</button><button class="lien-btn" type="button" data-vers="connexion">Retour</button></div>
+    </form>
+  </section>
+
+  <!-- 5. Mon compte -->
+  <section class="bloc carte-compte profil-compte" id="compte" hidden aria-labelledby="t-compte">
+    <div class="connecte"><span>Connecté · <b id="mon-nom"></b></span><button class="lien-btn" type="button" id="deconnexion">Me déconnecter</button></div>
+    <h2 class="cs-titre" id="t-compte" tabindex="-1">Mon profil</h2>
+    <dl class="infos-compte" id="infos"></dl>
+    <p class="note-f">Ton prénom et ton nom restent privés. Les autres voient ton pseudo, ou ton prénom et l'initiale de ton nom. Pour changer ton pseudo ou ta photo : dans l'appli, Profil.</p>
+    <p class="note-f" id="message-compte" role="status" hidden></p>
+    <div id="lien-admin" hidden><a class="btn" href="/admin">Ouvrir l'Admin Lokal</a></div>
+  </section>
+
+  <section class="bloc carte-compte miens" id="miens" hidden aria-labelledby="t-miens">
+    <div class="miens-tete"><h2 class="cs-titre" id="t-miens">Mes événements</h2><a class="btn petit" href="/ajouter">+ Ajouter</a></div>
+    <div id="liste-miens" class="liste-miens"></div>
+  </section>
+
+  <section class="bloc carte-compte danger-compte" id="supprimer" hidden aria-labelledby="t-supprimer">
+    <h2 class="cs-titre" id="t-supprimer">Supprimer mon compte</h2>
+    <p class="note-f">Ton compte, ton profil, tes événements et tes sorties sont effacés pour de bon, dans l'appli aussi. Impossible de revenir en arrière.</p>
+    <p class="erreur" role="alert" hidden></p>
+    <div><button class="btn danger" type="button" id="bouton-supprimer">Supprimer mon compte</button></div>
+  </section>
+</div>
+
+<dialog class="bloc fenetre-compte" id="confirmer" aria-labelledby="t-confirmer">
+  <h2 class="cs-titre" id="t-confirmer">Supprimer ton compte ?</h2>
+  <p class="note-f">Ton compte, ton profil, tes événements et tes sorties sont effacés pour de bon. Impossible de revenir en arrière.</p>
+  <div class="f-bas"><button class="btn danger" type="button" id="oui-supprimer">Supprimer</button><button class="btn sec" type="button" id="non-supprimer">Annuler</button></div>
+</dialog>
+</main>
+
+<footer class="pied cadre">
+  <div class="pied-grille">
+    <div class="pied-marque">
+      <img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal.">
+      <p>Ton agenda Lokal dans ta poche. Toutes les sorties autour de toi, en Belgique.</p>
+    </div>
+    <div><h2>L'appli</h2><ul><li><span>Bientôt sur Android et iPhone</span></li><li><a href="/#carte">La carte</a></li></ul></div>
+    <div><h2>Organisateurs</h2><ul><li><a href="/ajouter">Ajouter un événement</a></li><li><a href="/organisateurs">Comment ça marche</a></li><li><a href="/communes">Communes et salles</a></li><li><a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a></li></ul></div>
+    <div><h2>Infos</h2><ul><li><a href="/mentions-legales">Mentions légales</a></li><li><a href="/confidentialite">Confidentialité</a></li><li><a href="/conditions">Conditions d'utilisation</a></li><li><a href="/supprimer-compte">Supprimer mon compte</a></li></ul></div>
+  </div>
+  <div class="bas"><span>© 2026 Lokal · Carte © contributeurs OpenStreetMap</span><button class="haut" id="haut" type="button"><span class="rond petit" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></span>Remonter en haut</button></div>
+</footer>
+
+</body>
+</html>

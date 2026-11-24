@@ -270,6 +270,7 @@ async function demarrerCarte() {
       carte.on("mouseleave", id, () => (carte.getCanvas().style.cursor = ""));
     }
     afficherSurCarte();
+    if (aCentrer) carte.jumpTo({ center: [aCentrer.lng, aCentrer.lat], zoom: Math.max(carte.getZoom(), 14) });
   });
 }
 
@@ -668,6 +669,21 @@ const demarrer = () => {
   demarrerCarte();
   chargerEvenements();
 };
+// Lien « Voir sur la carte » de la page Mon compte : /?e=<id>#carte ouvre la fiche de cet événement.
+let aCentrer = null;
+const idLien = new URLSearchParams(location.search).get("e");
+if (idLien && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idLien)) {
+  demarrer();
+  api(`evenements?select=${COLONNES}&id=eq.${idLien}&visibilite=eq.visible`)
+    .then((lignes) => {
+      if (!lignes[0]) return;
+      const e = depuisLigne(lignes[0]);
+      aCentrer = e;
+      ouvrirFiche(e, { deplacer: true });
+      blocCarte.scrollIntoView({ block: "start" });
+    })
+    .catch(() => undefined);
+}
 if ("IntersectionObserver" in window) {
   const io = new IntersectionObserver((entrees) => {
     if (entrees.some((x) => x.isIntersecting)) {

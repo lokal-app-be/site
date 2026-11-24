@@ -1,14 +1,11 @@
 // Page « Ajouter un événement » : connexion au compte Lokal, puis le formulaire (mêmes règles que l'appli).
 import { CATEGORIES, svgIcone, aujourdhuiBelgique, ajouterJours, pastilleDate, lireLieux, chercherLieux, libelleLieu } from "./lokal.js";
-import {
-  sb, moi, seConnecter, connexionSociale, seDeconnecter, creerCompte, confirmerCode, renvoyerCode, envoyerCodeOubli,
-  nouveauMotDePasse, verifierInscription, emailValide, motDePasseValide, messageErreurCompte,
-} from "./compte.js";
+import { sb, moi, seDeconnecter } from "./compte.js";
+import { $, erreur, occupe, brancherConnexion } from "./connexion.js";
 import {
   verifier, datesSerie, nouvelleSerie, positionDepuisAdresse, versLigne, lirePrix, messageErreur, REPETITIONS, DUREE_SERIE_JOURS, tailleReduite,
 } from "./formulaire.js";
 
-const $ = (s, r = document) => r.querySelector(s);
 const aujourdhui = aujourdhuiBelgique();
 const VUES = ["chargement", "connexion", "creer", "code", "oubli", "formulaire", "publie"];
 let compte = null;
@@ -19,23 +16,6 @@ function montrer(vue) {
   const titre = $(`#${vue} h2, #${vue} input`);
   if (vue !== "chargement" && document.activeElement !== document.body) titre?.focus?.({ preventScroll: false });
 }
-function erreur(form, message) {
-  const p = $(".erreur", form);
-  p.textContent = message || "";
-  p.hidden = !message;
-}
-async function occupe(bouton, travail) {
-  bouton.disabled = true;
-  bouton.setAttribute("aria-busy", "true");
-  try {
-    return await travail();
-  } finally {
-    bouton.disabled = false;
-    bouton.removeAttribute("aria-busy");
-  }
-}
-document.querySelectorAll("[data-vers]").forEach((b) => b.addEventListener("click", () => montrer(b.dataset.vers)));
-
 // ================= Compte =================
 async function demarrer() {
   try {
@@ -50,102 +30,13 @@ async function demarrer() {
   apercu();
 }
 
-document.querySelectorAll("[data-fournisseur]").forEach((b) =>
-  b.addEventListener("click", () => occupe(b, async () => {
-    try {
-      await connexionSociale(b.dataset.fournisseur);
-    } catch (e) {
-      erreur($("#f-cnx"), messageErreurCompte(e));
-    }
-  })),
-);
-
-$("#f-cnx").addEventListener("submit", (ev) => {
-  ev.preventDefault();
-  const f = ev.currentTarget;
-  if (!emailValide(f.email.value)) return erreur(f, "Cet e-mail n'a pas l'air correct.");
-  if (!f.mdp.value) return erreur(f, "Ajoute ton mot de passe.");
-  occupe($("button[type=submit]", f), async () => {
-    try {
-      await seConnecter(f.email.value, f.mdp.value);
-      erreur(f, "");
-      f.mdp.value = "";
-      await demarrer();
-    } catch (e) {
-      erreur(f, messageErreurCompte(e));
-    }
-  });
-});
-
 let messageApresCompte = "";
-$("#f-creer").addEventListener("submit", (ev) => {
-  ev.preventDefault();
-  const f = ev.currentTarget;
-  const v = { prenom: f.prenom.value, nom: f.nom.value, pseudo: f.pseudo.value, email: f.email.value, motDePasse: f.mdp.value };
-  const pb = verifierInscription(v);
-  if (pb) return erreur(f, pb);
-  occupe($("button[type=submit]", f), async () => {
-    try {
-      const r = await creerCompte(v);
-      erreur(f, "");
-      if (r === "code") return montrer("code");
-      messageApresCompte = r === "sans-pseudo" ? "Compte créé. Ce pseudo n'a pas pu être gardé (déjà pris ou pas autorisé) : choisis-en un autre dans l'appli, Modifier mon profil." : "";
-      await demarrer();
-    } catch (e) {
-      erreur(f, messageErreurCompte(e));
-    }
-  });
-});
-
-$("#f-code").addEventListener("submit", (ev) => {
-  ev.preventDefault();
-  const f = ev.currentTarget;
-  if (!/^\d{6}$/.test(f.code.value.trim())) return erreur(f, "Le code a 6 chiffres. Tu le trouves dans l'e-mail.");
-  occupe($("button[type=submit]", f), async () => {
-    try {
-      const r = await confirmerCode(f.code.value);
-      erreur(f, "");
-      messageApresCompte = r === "sans-pseudo" ? "Compte créé. Ce pseudo n'a pas pu être gardé (déjà pris ou pas autorisé) : choisis-en un autre dans l'appli, Modifier mon profil." : "";
-      await demarrer();
-    } catch (e) {
-      erreur(f, messageErreurCompte(e));
-    }
-  });
-});
-$("#renvoyer").addEventListener("click", (ev) => occupe(ev.currentTarget, async () => {
-  try {
-    await renvoyerCode();
-    erreur($("#f-code"), "Nouveau code envoyé.");
-  } catch (e) {
-    erreur($("#f-code"), messageErreurCompte(e));
-  }
-}));
-
-$("#f-oubli").addEventListener("submit", (ev) => {
-  ev.preventDefault();
-  const f = ev.currentTarget;
-  const suite = $(".oubli-suite", f);
-  const bouton = $("button[type=submit]", f);
-  if (!emailValide(f.email.value)) return erreur(f, "Cet e-mail n'a pas l'air correct.");
-  occupe(bouton, async () => {
-    try {
-      if (suite.hidden) {
-        await envoyerCodeOubli(f.email.value);
-        suite.hidden = false;
-        bouton.textContent = "Changer mon mot de passe";
-        erreur(f, "");
-        f.code.focus();
-        return;
-      }
-      if (!/^\d{6}$/.test(f.code.value.trim())) return erreur(f, "Le code a 6 chiffres. Tu le trouves dans l'e-mail.");
-      if (!motDePasseValide(f.mdp.value)) return erreur(f, "Ton mot de passe doit avoir au moins 8 caractères.");
-      await nouveauMotDePasse(f.email.value, f.code.value, f.mdp.value);
-      erreur(f, "");
-      await demarrer();
-    } catch (e) {
-      erreur(f, messageErreurCompte(e));
-    }
-  });
+brancherConnexion({
+  montrer,
+  apres: async (message) => {
+    messageApresCompte = message;
+    await demarrer();
+  },
 });
 
 $("#deconnexion").addEventListener("click", async () => {

@@ -59,7 +59,7 @@ test("aucune donnée insérée comme du code : innerHTML seulement pour les icô
 });
 
 test("mêmes en-tête et pied de page sur toutes les pages publiques", () => {
-  const publiques = ["index.html", "organisateurs.html", "communes.html", "ajouter.html", "conditions.html", "confidentialite.html", "mentions-legales.html", "supprimer-compte.html"];
+  const publiques = ["index.html", "organisateurs.html", "communes.html", "ajouter.html", "compte.html", "conditions.html", "confidentialite.html", "mentions-legales.html", "supprimer-compte.html"];
   const sans = (x) => x?.replace(/ aria-current="page"/g, "").replaceAll('href="/#', 'href="#'); // sur l'accueil, « La carte » est sur la même page
   const tete = (f) => sans(lire(f).match(/<header class="tete[\s\S]*?<\/header>/)?.[0]);
   const pied = (f) => sans(lire(f).match(/<footer[\s\S]*?<\/footer>/)?.[0]);
@@ -73,6 +73,7 @@ test("mêmes en-tête et pied de page sur toutes les pages publiques", () => {
 test("Admin et Ajouter ne sont pas proposées aux moteurs de recherche", () => {
   assert.match(lire("admin.html"), /<meta name="robots" content="noindex, nofollow">/);
   assert.match(lire("ajouter.html"), /<meta name="robots" content="noindex/);
+  assert.match(lire("compte.html"), /<meta name="robots" content="noindex/);
   assert.doesNotMatch(lire("sitemap.xml"), /\/admin|\/ajouter/);
 });
 
