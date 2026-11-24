@@ -116,7 +116,13 @@
 .carte .maplibregl-canvas:focus-visible { outline: 3px solid var(--rose); outline-offset: -3px; }
 .etat-carte { position: absolute; left: 50%; top: 16px; z-index: 3; transform: translateX(-50%); max-width: calc(100% - 32px); padding: 8px 16px; border-radius: var(--rond); background: var(--fg); color: #fff; font: 600 13px/1.3 var(--police); text-align: center; box-shadow: var(--ombre-carte); pointer-events: none; }
 .etat-carte[hidden] { display: none; }
-.boutons-carte { position: absolute; right: 16px; bottom: 32px; z-index: 3; display: grid; gap: 12px; }
+.boutons-carte { position: absolute; right: 16px; bottom: 32px; z-index: 3; display: grid; gap: 12px; justify-items: center; }
+/* + et − collés l'un sur l'autre, comme une seule pièce ; la position en dessous. Même chose sur téléphone, tablette et ordinateur. */
+.zoom { display: grid; border: 2px solid var(--fg); border-radius: 999px; background: var(--surface); box-shadow: 3px 3px 0 var(--rose); overflow: hidden; }
+.zoom .rond { border: 0; box-shadow: none; border-radius: 0; width: 44px; height: 44px; }
+.zoom .rond + .rond { border-top: 1.5px solid var(--line); }
+.zoom .rond:hover:not(:disabled), .zoom .rond:focus-visible { background: var(--bg); }
+.zoom .rond:disabled { color: var(--muted); opacity: .45; cursor: default; }
 .maplibregl-ctrl-attrib { font: 500 11px var(--police) !important; }
 
 /* La fiche */

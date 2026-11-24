@@ -204,6 +204,7 @@ async function demarrerCarte() {
       "TouchPanBlocker.Message": "Utilise deux doigts pour déplacer la carte",
     },
   });
+  carte.on("zoomend", majZoom);
   carte.touchZoomRotate.disableRotation();
   carte.keyboard.disableRotation();
 
@@ -486,6 +487,19 @@ champDate.addEventListener("change", () => {
 champDate.addEventListener("click", () => champDate.showPicker && champDate.showPicker());
 
 // ================= Autour de moi =================
+// Boutons + et − (demande d'Arnaud, 24 nov. 2026) : même pas de zoom que la molette, grisés aux limites.
+function majZoom() {
+  if (!carte) return;
+  $("#zoom-plus").disabled = carte.getZoom() >= carte.getMaxZoom() - 0.01;
+  // Dézoomer ne sert plus quand la carte montre déjà toute la zone permise (la Belgique et ses environs).
+  const vue = carte.getBounds();
+  const zone = carte.getMaxBounds();
+  const toutVu = zone && (vue.getEast() - vue.getWest() >= zone.getEast() - zone.getWest() - 0.05 || vue.getNorth() - vue.getSouth() >= zone.getNorth() - zone.getSouth() - 0.05);
+  $("#zoom-moins").disabled = carte.getZoom() <= carte.getMinZoom() + 0.01 || !!toutVu;
+}
+$("#zoom-plus").addEventListener("click", () => carte?.zoomIn({ duration: doux ? 300 : 0 }));
+$("#zoom-moins").addEventListener("click", () => carte?.zoomOut({ duration: doux ? 300 : 0 }));
+
 $("#ma-position").addEventListener("click", () => {
   if (!navigator.geolocation) return etat("Ta position n'est pas disponible sur ce navigateur.");
   navigator.geolocation.getCurrentPosition(
