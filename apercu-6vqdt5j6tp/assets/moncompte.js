@@ -85,19 +85,30 @@ function ligneMien(e) {
   return ligne;
 }
 
+// Mes événements et Scannés par toi : deux listes repliées, avec leur nombre (demande d'Arnaud du 24 nov. 2026).
+function remplir(cle, liste, vide) {
+  const zone = $(`#liste-${cle}`);
+  const nombre = $(`#n-${cle}`);
+  nombre.textContent = String(liste.length);
+  nombre.hidden = false;
+  zone.replaceChildren(...(liste.length ? liste.map(ligneMien) : [el("p", "vide", vide)]));
+}
+
 async function chargerMiens() {
   const zone = $("#liste-miens");
+  $("#n-miens").hidden = true;
+  $("#d-scannes").hidden = true;
   zone.replaceChildren(el("p", "vide", "Chargement…"));
   try {
     const { data, error } = await sb().from("evenements").select(`${COLONNES},visibilite,prive`).eq("cree_par", compte.id).order("date_debut").limit(500);
     if (error) throw error;
     const liste = (data ?? []).map((l) => ({ ...depuisLigne(l), visibilite: l.visibilite, prive: !!l.prive }));
     const { miens, scannes } = trierMiens(liste, aujourdhui);
-    if (!miens.length && !scannes.length) return zone.replaceChildren(el("p", "vide", "Tu n'as encore publié aucun événement."));
-    zone.replaceChildren();
-    if (miens.length) zone.append(...miens.map(ligneMien));
-    else zone.append(el("p", "vide", "Tu n'as encore publié aucun événement toi-même."));
-    if (scannes.length) zone.append(el("h3", "", "Scannés par toi"), ...scannes.map(ligneMien));
+    remplir("miens", miens, scannes.length ? "Tu n'as encore publié aucun événement toi-même." : "Tu n'as encore publié aucun événement.");
+    if (scannes.length) {
+      remplir("scannes", scannes, "");
+      $("#d-scannes").hidden = false;
+    }
   } catch {
     zone.replaceChildren(el("p", "vide", "Tes événements n'ont pas pu être chargés. Réessaie dans un moment."));
   }
