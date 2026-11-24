@@ -250,10 +250,15 @@ async function demarrerCarte() {
       paint: { "icon-opacity": ["case", ["==", ["get", "annule"], 1], 0.45, 1] },
     });
 
+    // Un rond avec un nombre : la liste de ses événements (demande d'Arnaud du 24 nov. 2026), et non plus un zoom.
     carte.on("click", "groupes", async (ev) => {
       const f = ev.features[0];
-      const zoom = await carte.getSource("evenements").getClusterExpansionZoom(f.properties.cluster_id);
-      carte.easeTo({ center: f.geometry.coordinates, zoom, duration: doux ? 600 : 0 });
+      const source = carte.getSource("evenements");
+      const feuilles = await source.getClusterLeaves(f.properties.cluster_id, Infinity, 0);
+      const ids = new Set(feuilles.map((x) => x.properties.id));
+      const liste = [...evenements, ...(horsPeriode ? [horsPeriode] : [])].filter((e) => ids.has(e.id));
+      if (!liste.length) return;
+      ouvrirGroupe({ liste, centre: f.geometry.coordinates, zoom: await source.getClusterExpansionZoom(f.properties.cluster_id) });
     });
     carte.on("click", "reperes", (ev) => {
       const id = ev.features[0].properties.id;
@@ -292,7 +297,7 @@ function lien(href, texte, cls) {
   return a;
 }
 
-function carteProche(e) {
+function carteProche(e, { depuisGroupe = false } = {}) {
   const b = el("button", "evc");
   b.type = "button";
   const t = el("div", "evc-t");
@@ -301,7 +306,7 @@ function carteProche(e) {
   if (e.certifie) p.append(el("span", "certif", "✓ Certifié"));
   t.append(p, el("b", "", e.titre), el("small", "", [e.lieu, e.village].filter(Boolean).join(" · ")));
   b.append(ico(e.categorie), t);
-  b.addEventListener("click", () => ouvrirFiche(e, { deplacer: true }));
+  b.addEventListener("click", () => ouvrirFiche(e, { deplacer: !depuisGroupe, depuisGroupe }));
   return b;
 }
 
@@ -333,7 +338,60 @@ function noteNonCertifie(e) {
 }
 
 let ficheDansHistorique = false;
-function ouvrirFiche(e, { deplacer }) {
+let groupeOuvert = null; // { liste, centre, zoom } : la fiche ouverte depuis la liste d'un rond revient à cette liste
+
+// Montre le panneau (à droite sur tablette et ordinateur, en plein écran sur téléphone).
+function montrerPanneau(contenu, titre) {
+  PANNEAU.replaceChildren(...contenu);
+  PANNEAU.setAttribute("aria-labelledby", titre.id);
+  PANNEAU.hidden = false;
+  PANNEAU.scrollTop = 0;
+  ZONE.classList.add("ouvert");
+  if (!deuxColonnes.matches) {
+    document.body.classList.add("fiche-ouverte");
+    // Le bouton « retour » du téléphone ferme le panneau au lieu de quitter le site.
+    if (!ficheDansHistorique) {
+      history.pushState({ fiche: true }, "");
+      ficheDansHistorique = true;
+    }
+  }
+  titre.focus({ preventScroll: true });
+  if (carte) carte.resize();
+}
+
+// Les événements d'un rond avec un nombre, par date.
+function ouvrirGroupe(g) {
+  groupeOuvert = g;
+  selection = null;
+  marquerSelection();
+  const telephone = !deuxColonnes.matches;
+  const fermer = el("button", "rond petit fermer");
+  fermer.type = "button";
+  fermer.setAttribute("aria-label", telephone ? "Retour à la carte" : "Fermer la liste");
+  fermer.innerHTML = telephone ? SVG_RETOUR : SVG_FERMER;
+  fermer.addEventListener("click", () => fermerFiche());
+  const tries = [...g.liste].sort((a, b) => `${a.date} ${a.heure || ""}`.localeCompare(`${b.date} ${b.heure || ""}`) || a.titre.localeCompare(b.titre));
+  const titre = el("h3", "titre-fiche", `${tries.length} événements ici`);
+  titre.id = "titre-groupe";
+  titre.tabIndex = -1;
+  const zoomer = el("button", "btn sec petit", "Zoomer sur la carte");
+  zoomer.type = "button";
+  zoomer.addEventListener("click", () => {
+    const g2 = groupeOuvert;
+    fermerFiche();
+    if (carte && g2) carte.easeTo({ center: g2.centre, zoom: g2.zoom, duration: doux ? 600 : 0 });
+  });
+  const liste = el("div", "proches");
+  liste.append(...tries.map((e) => carteProche(e, { depuisGroupe: true })));
+  const actions = el("div", "actions");
+  actions.append(zoomer);
+  const corps = el("div", "corps seul");
+  corps.append(titre, actions, liste);
+  montrerPanneau([fermer, corps], titre);
+}
+
+function ouvrirFiche(e, { deplacer, depuisGroupe = false }) {
+  if (!depuisGroupe) groupeOuvert = null;
   selection = e.id;
   const avant = horsPeriode;
   horsPeriode = evenements.some((x) => x.id === e.id) ? null : e;
@@ -343,9 +401,10 @@ function ouvrirFiche(e, { deplacer }) {
   const fermer = el("button", "rond petit fermer");
   fermer.type = "button";
   const telephone = !deuxColonnes.matches;
-  fermer.setAttribute("aria-label", telephone ? "Retour à la carte" : "Fermer la fiche");
-  fermer.innerHTML = telephone ? SVG_RETOUR : SVG_FERMER;
-  fermer.addEventListener("click", () => fermerFiche());
+  const retour = telephone || !!groupeOuvert;
+  fermer.setAttribute("aria-label", groupeOuvert ? "Retour à la liste" : telephone ? "Retour à la carte" : "Fermer la fiche");
+  fermer.innerHTML = retour ? SVG_RETOUR : SVG_FERMER;
+  fermer.addEventListener("click", () => (groupeOuvert ? ouvrirGroupe(groupeOuvert) : fermerFiche()));
 
   // Affiche en grand en haut (option B de la charte) : la photo, sinon une affiche dessinée aux couleurs du type.
   const aff = el("div", "grande-affiche");
@@ -415,28 +474,13 @@ function ouvrirFiche(e, { deplacer }) {
   }
   contenu.push(corps);
 
-  PANNEAU.replaceChildren(...contenu);
-  PANNEAU.setAttribute("aria-labelledby", "titre-fiche");
-  PANNEAU.hidden = false;
-  PANNEAU.scrollTop = 0;
-  ZONE.classList.add("ouvert");
-  if (telephone) {
-    document.body.classList.add("fiche-ouverte");
-    // Le bouton « retour » du téléphone ferme la fiche au lieu de quitter le site.
-    if (!ficheDansHistorique) {
-      history.pushState({ fiche: true }, "");
-      ficheDansHistorique = true;
-    }
-  }
-  titre.focus({ preventScroll: true });
-  if (carte) {
-    carte.resize();
-    if (deplacer) carte.easeTo({ center: [e.lng, e.lat], zoom: Math.max(carte.getZoom(), 14), duration: doux ? 700 : 0 });
-  }
+  montrerPanneau(contenu, titre);
+  if (carte && deplacer) carte.easeTo({ center: [e.lng, e.lat], zoom: Math.max(carte.getZoom(), 14), duration: doux ? 700 : 0 });
 }
 
 function fermerFiche(depuisHistorique = false) {
   if (PANNEAU.hidden) return;
+  groupeOuvert = null;
   PANNEAU.hidden = true;
   PANNEAU.replaceChildren();
   ZONE.classList.remove("ouvert");
@@ -459,7 +503,8 @@ document.addEventListener("keydown", (e) => {
 deuxColonnes.addEventListener("change", () => {
   if (PANNEAU.hidden) return;
   const e = evenements.find((x) => x.id === selection) || horsPeriode;
-  if (e) ouvrirFiche(e, { deplacer: false });
+  if (e) ouvrirFiche(e, { deplacer: false, depuisGroupe: !!groupeOuvert });
+  else if (groupeOuvert) ouvrirGroupe(groupeOuvert);
 });
 
 // ================= Filtres de date =================

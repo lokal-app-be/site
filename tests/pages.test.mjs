@@ -53,7 +53,7 @@ test("aucune donnée insérée comme du code : innerHTML seulement pour les icô
   for (const f of nosScripts.filter((x) => !x.includes("maplibre"))) {
     for (const ligne of lire(f).split("\n")) {
       if (/insertAdjacentHTML|outerHTML\s*=|document\.write|\beval\(|new Function\(/.test(ligne)) assert.fail(`${f} : ${ligne.trim()}`);
-      if (/innerHTML\s*=/.test(ligne)) assert.match(ligne, /innerHTML = (svgIcone\(|telephone \? SVG_RETOUR : SVG_FERMER)/, `${f} : ${ligne.trim()}`);
+      if (/innerHTML\s*=/.test(ligne)) assert.match(ligne, /innerHTML = (svgIcone\(|(telephone|retour) \? SVG_RETOUR : SVG_FERMER)/, `${f} : ${ligne.trim()}`);
     }
   }
 });
