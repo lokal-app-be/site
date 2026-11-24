@@ -50,7 +50,7 @@ test("scanner : texte, lien ou réseau social", () => {
   assert.equal(natureTexte("x".repeat(9000)).texte.length, 6000);
   assert.equal(nomSource("https://www.tellin.be/agenda?x=1"), "tellin.be");
   assert.equal(nomSource("https://fb.me/abc"), "Facebook");
-  assert.equal(messageScan("limite"), "Plafond atteint : 30 scans par jour et par personne.");
+  assert.equal(messageScan("limite"), "Plafond atteint : 300 scans par jour pour l'équipe Lokal.");
   assert.match(messageScan("???"), /^La lecture n'a pas marché/);
 });
 

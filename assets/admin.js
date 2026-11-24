@@ -471,7 +471,10 @@ function noterRetrait(r) {
 }
 
 // ---- Scanner un panneau, un texte ou un lien (comme l'appli, mode équipe Lokal) ----
-let scan = null; // { prets, mauvaise, source }
+// Plusieurs photos à la fois (demande d'Arnaud du 24 nov. 2026) : lues l'une après l'autre,
+// chaque photo a sa propre case de résultat, vérifiée et publiée séparément. Pas de « Tout publier ».
+const MAX_PHOTOS = 10;
+let lot = null; // { groupes: [{ nom, etat, message, prets, mauvaise, source, publies, noeud }], enCours }
 const erreurScan = (t) => {
   $("erreur-scan").textContent = t;
   $("erreur-scan").hidden = !t;
@@ -545,29 +548,28 @@ async function evenementsEntre(debut, fin) {
   return (data ?? []).map(depuisLigne);
 }
 
-function attente(texte) {
-  erreurScan("");
-  resultat.hidden = false;
-  vider(resultat, el("h2", { class: "h-bloc", texte }), el("p", { class: "note", role: "status", texte: "Claude cherche les événements annoncés. Cela prend quelques secondes." }));
-  resultat.scrollIntoView({ block: "nearest" });
+function liberer(g) {
+  g.prets?.forEach((p) => p.url && URL.revokeObjectURL(p.url));
+  g.prets = null;
 }
 function fermerResultat() {
-  scan?.prets.forEach((p) => p.url && URL.revokeObjectURL(p.url));
-  scan = null;
+  lot?.groupes.forEach(liberer);
+  lot = null;
   resultat.hidden = true;
   vider(resultat);
 }
 
-async function traiter(lecture, canvas, source) {
+// Prépare les événements lus : retourne ce qui s'affiche dans la case de la photo (ou du texte).
+async function traiter(g, lecture, canvas) {
   const photo = !!canvas;
-  if (lecture.choquant) return erreurScan(photo ? "Affiche refusée : contenu choquant" : "Texte refusé : contenu choquant");
+  if (lecture.choquant) return Object.assign(g, { etat: "erreur", message: photo ? "Affiche refusée : contenu choquant" : "Texte refusé : contenu choquant" });
   const auj = aujourdhuiBelgique();
   const tous = versBrouillons(lecture, auj).filter((b) => b.date);
-  if (!lecture.affiche || !tous.length) return erreurScan(photo ? "Aucun événement lisible sur cette photo · essaie plus près, bien à plat" : "Aucun événement trouvé dans ce texte");
+  if (!lecture.affiche || !tous.length) return Object.assign(g, { etat: "erreur", message: photo ? "Aucun événement lisible sur cette photo · essaie plus près, bien à plat" : "Aucun événement trouvé dans ce texte" });
   const etrangers = tous.filter((b) => b.etranger);
   if (etrangers.length) toast(`${etrangers.length > 1 ? `${etrangers.length} événements ignorés : ` : ""}Pour l'instant, l'appli ne propose que la Belgique.`);
   const belges = tous.filter((b) => !b.etranger);
-  if (!belges.length) return fermerResultat();
+  if (!belges.length) return Object.assign(g, { etat: "erreur", message: "Aucun événement en Belgique sur cette photo" });
   const ls = await chargerLieux();
   const jours = belges.map((b) => b.date).sort();
   const existants = await evenementsEntre(jours[0], jours[jours.length - 1]).catch(() => []);
@@ -580,32 +582,65 @@ async function traiter(lecture, canvas, source) {
     const blob = mauvaise || !canvas ? null : await recadrer(canvas, b.cadre).catch(() => null);
     prets.push({ b, lieu, blob, url: blob ? URL.createObjectURL(blob) : null, cleCadre: JSON.stringify(b.cadre), doublon, coche: !doublon && !b.passe });
   }
-  scan = { prets, mauvaise, source };
-  afficherResultat();
+  return Object.assign(g, { etat: "pret", prets, mauvaise });
 }
 
-function choisirVillage(p, conteneur) {
+function choisirVillage(g, p, conteneur) {
   const champ = el("input", { class: "champ", type: "search", placeholder: "Le village ou la commune", "aria-label": "Le village ou la commune", autocomplete: "off" });
   const choix = el("div", { class: "filtres-puces" });
   champ.addEventListener("input", async () => {
     const ls = await chargerLieux();
-    vider(choix, ...chercherLieux(champ.value, ls, 5).map((l) => el("button", { class: "chip", type: "button", texte: libelleLieu(l), onclick: () => ((p.lieu = l), afficherResultat()) })));
+    vider(choix, ...chercherLieux(champ.value, ls, 5).map((l) => el("button", { class: "chip", type: "button", texte: libelleLieu(l), onclick: () => ((p.lieu = l), afficherGroupe(g)) })));
   });
   conteneur.append(el("div", { class: "f" }, el("span", { class: "note", texte: "Lieu pas reconnu : choisis la commune avant de publier." }), champ, choix));
 }
 
-function afficherResultat() {
-  const { prets, mauvaise, source } = scan;
+// L'en-tête du lot (plusieurs photos seulement) : où en est la lecture.
+function afficherEntete() {
+  const n = lot.groupes.length;
+  if (n < 2) return vider(lot.entete);
+  const lues = lot.groupes.filter((g) => !["attente", "lecture"].includes(g.etat)).length;
+  vider(
+    lot.entete,
+    el("p", { class: "kicker", texte: "Résultat du scan" }),
+    el("h2", { class: "h-bloc", texte: `${n} photos` }),
+    el("p", { class: "note", role: "status", texte: lues < n ? `Lecture de la photo ${lues + 1} sur ${n}… Tu peux déjà vérifier les photos lues.` : "Toutes les photos sont lues. Vérifie chaque événement avant de publier : Claude peut se tromper." }),
+  );
+}
+
+function afficherGroupe(g) {
+  const n = lot.groupes.length;
+  const i = lot.groupes.indexOf(g);
+  const kicker = n > 1 ? el("p", { class: "kicker" }, `Photo ${i + 1} sur ${n}`, g.nom ? el("span", { class: "detail", texte: ` · ${g.nom}` }) : null) : el("p", { class: "kicker", texte: g.etat === "publie" ? "C'est publié" : "Résultat du scan" });
+  const ignorer = (texte = "Ignorer cette photo") => el("button", { class: "btn sec", type: "button", texte: n > 1 ? texte : "Fermer", onclick: () => retirerGroupe(g) });
+  if (g.etat === "attente" || g.etat === "lecture") {
+    return vider(g.noeud, kicker, el("h2", { class: "h-bloc", texte: g.source.type === "import" ? "Lecture du texte…" : g.etat === "lecture" ? "Lecture du panneau…" : "En attente" }), el("p", { class: "note", texte: g.etat === "lecture" ? "Claude cherche les événements annoncés. Cela prend quelques secondes." : "Cette photo sera lue juste après." }));
+  }
+  if (g.etat === "erreur") {
+    return vider(g.noeud, kicker, el("div", { class: "bandeau danger", role: "alert" }, el("b", { texte: "Pas d'événement à publier" }), el("span", { texte: g.message })), el("div", { class: "actions" }, ignorer("Retirer cette photo")));
+  }
+  if (g.etat === "publie") {
+    const pub = g.publies;
+    return vider(
+      g.noeud,
+      kicker,
+      el("h2", { class: "h-bloc", texte: `${pluriel(pub.length, "événement publié", "événements publiés")} · non certifié${pub.length > 1 ? "s" : ""}` }),
+      ...pub.map((e) =>
+        el("div", { class: "membre" }, el("div", {}, el("span", { class: "titre-ev" }, icone(e.categorie, true), e.titre), el("span", { class: "detail", texte: `${formatJour(e.date_debut)} · ${String(e.heure_debut).slice(0, 5)} · ${e.village}` })), el("button", { class: "btn sec petit", type: "button", texte: "Voir", onclick: () => voir(e.id) })),
+      ),
+      n > 1 ? null : el("div", { class: "actions" }, el("button", { class: "btn sec", type: "button", texte: "Scanner autre chose", onclick: fermerResultat })),
+    );
+  }
+  const { prets, mauvaise, source } = g;
   const depuisTexte = source.type === "import";
-  const n = prets.length;
+  const nb = prets.length;
   const aPublier = prets.filter((p) => p.coche && !p.doublon && !p.b.passe);
   const ligne = (t, v) => el("p", { class: "ligne-lue" }, el("span", { class: "detail", texte: `${t} : ` }), v);
-  const publier = el("button", { class: "btn", type: "button", texte: "Publier la sélection", onclick: () => publierScan(publier) });
-  resultat.hidden = false;
+  const publier = el("button", { class: "btn", type: "button", texte: "Publier la sélection", onclick: () => publierScan(g, publier) });
   vider(
-    resultat,
-    el("p", { class: "kicker", texte: "Résultat du scan" }),
-    el("h2", { class: "h-bloc", texte: depuisTexte ? `${n} événement${n > 1 ? "s" : ""} trouvé${n > 1 ? "s" : ""}` : `${n} affiche${n > 1 ? "s" : ""} trouvée${n > 1 ? "s" : ""}` }),
+    g.noeud,
+    kicker,
+    el("h2", { class: "h-bloc", texte: depuisTexte ? `${nb} événement${nb > 1 ? "s" : ""} trouvé${nb > 1 ? "s" : ""}` : `${nb} affiche${nb > 1 ? "s" : ""} trouvée${nb > 1 ? "s" : ""}` }),
     el("p", { class: "note", texte: `Source : ${source.nom ?? (depuisTexte ? "texte collé" : "photo")}.${depuisTexte ? " Chaque événement aura une fiche dans le style Lokal à la place d'une photo d'affiche." : ""}` }),
     mauvaise ? el("p", { class: "note" }, el("b", { texte: "Photo peu lisible : " }), "on affiche une reproduction de l'affiche dans le style Lokal à la place.") : null,
     ...prets.map((p) => {
@@ -629,20 +664,54 @@ function afficherResultat() {
         b.description ? ligne("Infos", b.description) : null,
         b.resume ? el("p", { class: "note", texte: "Résumé de l'affiche en quelques lignes. Une fois certifié, l'organisateur pourra mettre son texte complet." }) : null,
       );
-      if (!b.passe && !p.doublon && !p.lieu) choisirVillage(p, corps);
+      if (!b.passe && !p.doublon && !p.lieu) choisirVillage(g, p, corps);
       const caseP = !b.passe && !p.doublon
-        ? el("input", { type: "checkbox", checked: p.coche, "aria-label": `Publier « ${b.titre} »`, onchange: (e) => ((p.coche = e.target.checked), afficherResultat()) })
+        ? el("input", { type: "checkbox", checked: p.coche, "aria-label": `Publier « ${b.titre} »`, onchange: (e) => ((p.coche = e.target.checked), afficherGroupe(g)) })
         : el("span");
       return el("article", { class: "brouillon" }, caseP, corps);
     }),
     el("div", { class: "pills" }, ["Aucun contenu choquant", ...(prets.every((p) => !p.b.passe) ? ["Date à venir"] : []), ...(depuisTexte ? [] : ["Photo recadrée sur l'affiche"])].map((t) => el("span", { class: "pastille", texte: `✓ ${t}` }))),
     el("p", { class: "note", texte: "Ces infos viennent de l'affiche et ne peuvent pas être modifiées. Lu par Claude : vérifie avant de publier. En cas d'erreur, ne publie pas et réessaie." }),
-    el("div", { class: "actions" }, aPublier.length ? publier : null, el("button", { class: "btn sec", type: "button", texte: aPublier.length ? "Annuler" : "Fermer", onclick: fermerResultat })),
+    el("div", { class: "actions" }, aPublier.length ? publier : null, n > 1 ? ignorer() : el("button", { class: "btn sec", type: "button", texte: aPublier.length ? "Annuler" : "Fermer", onclick: fermerResultat })),
   );
 }
 
-async function publierScan(bouton) {
-  const aPublier = scan.prets.filter((p) => p.coche && !p.doublon && !p.b.passe);
+function retirerGroupe(g) {
+  liberer(g);
+  lot.groupes = lot.groupes.filter((x) => x !== g);
+  g.noeud.remove();
+  if (!lot.groupes.length) return fermerResultat();
+  afficherEntete();
+  lot.groupes.forEach(afficherGroupe); // les numéros « Photo 2 sur 3 » changent
+  afficherPied();
+}
+
+function afficherPied() {
+  vider(lot.pied, lot.groupes.length > 1 && !lot.enCours ? el("div", { class: "actions" }, el("button", { class: "btn sec", type: "button", texte: "Tout fermer", onclick: fermerResultat })) : null);
+}
+
+// Ouvre un nouveau lot de photos (ou un texte) dans la zone de résultat.
+function nouveauLot(groupes) {
+  fermerResultat();
+  erreurScan("");
+  lot = { groupes, enCours: true, entete: el("div", { class: "champs" }), pied: el("div") };
+  for (const g of groupes) g.noeud = el("section", { class: "groupe-scan champs" });
+  resultat.hidden = false;
+  vider(resultat, lot.entete, ...groupes.map((g) => g.noeud), lot.pied);
+  afficherEntete();
+  groupes.forEach(afficherGroupe);
+  afficherPied();
+  resultat.scrollIntoView({ block: "nearest" });
+}
+function finLot() {
+  if (!lot) return;
+  lot.enCours = false;
+  afficherEntete();
+  afficherPied();
+}
+
+async function publierScan(g, bouton) {
+  const aPublier = g.prets.filter((p) => p.coche && !p.doublon && !p.b.passe);
   const sansLieu = aPublier.find((p) => !p.lieu);
   if (sansLieu) return toast(`Choisis d'abord la commune de « ${sansLieu.b.titre} »`);
   bouton.disabled = true;
@@ -688,11 +757,12 @@ async function publierScan(bouton) {
       });
       const { data, error } = await sb()
         .from("evenements")
-        .insert({ ...ligne, source: scan.source.type, source_url: scan.source.url, source_nom: scan.source.nom })
+        .insert({ ...ligne, source: g.source.type, source_url: g.source.url, source_nom: g.source.nom })
         .select("id,titre,categorie,date_debut,heure_debut,village")
         .single();
       if (error) throw error;
       publies.push(data);
+      p.publie = true;
     }
   } catch (err) {
     toast(messageErreur(err));
@@ -703,45 +773,66 @@ async function publierScan(bouton) {
       return;
     }
   }
-  scan.prets.forEach((p) => p.url && URL.revokeObjectURL(p.url));
-  scan = null;
   nonCertifies = null;
-  vider(
-    resultat,
-    el("p", { class: "kicker", texte: "C'est publié" }),
-    el("h2", { class: "h-bloc", texte: `${pluriel(publies.length, "événement publié", "événements publiés")} · non certifié${publies.length > 1 ? "s" : ""}` }),
-    ...publies.map((e) =>
-      el("div", { class: "membre" }, el("div", {}, el("span", { class: "titre-ev" }, icone(e.categorie, true), e.titre), el("span", { class: "detail", texte: `${formatJour(e.date_debut)} · ${String(e.heure_debut).slice(0, 5)} · ${e.village}` })), el("button", { class: "btn sec petit", type: "button", texte: "Voir", onclick: () => voir(e.id) })),
-    ),
-    el("div", { class: "actions" }, el("button", { class: "btn sec", type: "button", texte: "Scanner autre chose", onclick: fermerResultat })),
-  );
+  if (!lot?.groupes.includes(g)) return;
+  liberer(g);
+  Object.assign(g, { etat: "publie", publies });
+  afficherGroupe(g);
 }
 
-async function scannerPhoto(fichier) {
-  if (!fichier || !/^image\/(jpeg|png|webp)$/.test(fichier.type)) return erreurScan("Choisis une photo (JPEG, PNG ou WebP).");
+// Lit les photos l'une après l'autre. Plafond de scans atteint : les photos restantes ne sont pas envoyées.
+async function scannerPhotos(liste) {
+  if (lot?.enCours) return toast("Attends la fin de la lecture en cours");
+  const fichiers = [...(liste ?? [])];
+  if (!fichiers.length) return;
+  const bonnes = fichiers.filter((f) => /^image\/(jpeg|png|webp)$/.test(f.type));
+  if (!bonnes.length) return erreurScan(fichiers.length > 1 ? "Choisis des photos (JPEG, PNG ou WebP)." : "Choisis une photo (JPEG, PNG ou WebP).");
   const lien = $("lien-photo").value.trim();
   if (lien && !lienSourceValide(lien)) return erreurScan("Le lien doit commencer par https://");
-  fermerResultat();
-  attente("Lecture du panneau…");
-  try {
-    const canvas = await lirePhoto(fichier);
-    const base64 = (await new Promise((ok) => {
-      const r = new FileReader();
-      versBlob(canvas, 0.8).then((b) => {
-        r.onload = () => ok(String(r.result));
-        r.readAsDataURL(b);
-      });
-    })).split(",")[1];
-    const lecture = await lire({ image: base64, aujourdhui: aujourdhuiBelgique() });
-    resultat.hidden = true;
-    await traiter(lecture, canvas, { type: "affiche", url: lien || null, nom: lien ? nomSource(lien) : null });
-  } catch (err) {
-    resultat.hidden = true;
-    erreurScan(err?.scan ? messageScan(err.scan) : messageErreur(err));
+  const ecartees = fichiers.length - bonnes.length;
+  if (ecartees) toast(`${pluriel(ecartees, "fichier ignoré", "fichiers ignorés")} : ce n'est pas une photo JPEG, PNG ou WebP`);
+  if (bonnes.length > MAX_PHOTOS) toast(`${MAX_PHOTOS} photos au maximum à la fois : les ${MAX_PHOTOS} premières sont lues`);
+  const source = { type: "affiche", url: lien || null, nom: lien ? nomSource(lien) : null };
+  const groupes = bonnes.slice(0, MAX_PHOTOS).map((f) => ({ fichier: f, nom: bonnes.length > 1 ? f.name.slice(0, 60) : "", etat: "attente", source }));
+  nouveauLot(groupes);
+  const monLot = lot;
+  let arret = null;
+  for (const g of groupes) {
+    if (lot !== monLot) return; // tout fermé pendant la lecture
+    if (!monLot.groupes.includes(g)) continue; // photo retirée entre-temps
+    if (arret) {
+      Object.assign(g, { etat: "erreur", message: arret });
+      afficherGroupe(g);
+      continue;
+    }
+    g.etat = "lecture";
+    afficherGroupe(g);
+    try {
+      const canvas = await lirePhoto(g.fichier);
+      const base64 = (await new Promise((ok) => {
+        const r = new FileReader();
+        versBlob(canvas, 0.8).then((b) => {
+          r.onload = () => ok(String(r.result));
+          r.readAsDataURL(b);
+        });
+      })).split(",")[1];
+      const lecture = await lire({ image: base64, aujourdhui: aujourdhuiBelgique() });
+      await traiter(g, lecture, canvas);
+    } catch (err) {
+      const message = err?.scan ? messageScan(err.scan) : err?.message === "image" ? "Cette photo ne s'ouvre pas." : messageErreur(err);
+      if (err?.scan === "limite" || err?.scan === "pas_de_cle") arret = message;
+      Object.assign(g, { etat: "erreur", message });
+    }
+    g.fichier = null;
+    if (lot !== monLot) return liberer(g);
+    if (monLot.groupes.includes(g)) afficherGroupe(g);
+    else liberer(g);
+    afficherEntete();
   }
+  finLot();
 }
 $("fichier-scan").addEventListener("change", (e) => {
-  scannerPhoto(e.target.files?.[0]);
+  scannerPhotos(e.target.files);
   e.target.value = "";
 });
 const depot = $("depot-scan");
@@ -749,23 +840,26 @@ const depot = $("depot-scan");
 ["dragleave", "drop"].forEach((t) => depot.addEventListener(t, () => depot.classList.remove("survol")));
 depot.addEventListener("drop", (e) => {
   e.preventDefault();
-  scannerPhoto(e.dataTransfer?.files?.[0]);
+  scannerPhotos(e.dataTransfer?.files);
 });
 $("f-texte").addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (lot?.enCours) return toast("Attends la fin de la lecture en cours");
   const n = natureTexte(e.target.texte.value);
   if (n.erreur) return erreurScan(n.erreur);
-  fermerResultat();
-  attente("Lecture du texte…");
+  const g = { nom: "", etat: "lecture", source: n.lien ? { type: "import", url: n.lien, nom: nomSource(n.lien) } : { type: "import", url: null, nom: null } };
+  nouveauLot([g]);
+  const monLot = lot;
   const auj = aujourdhuiBelgique();
   try {
     const lecture = await lire(n.lien ? { lien: n.lien, aujourdhui: auj } : { texte: n.texte, aujourdhui: auj });
-    resultat.hidden = true;
-    await traiter(lecture, null, n.lien ? { type: "import", url: n.lien, nom: nomSource(n.lien) } : { type: "import", url: null, nom: null });
+    await traiter(g, lecture, null);
   } catch (err) {
-    resultat.hidden = true;
-    erreurScan(err?.scan ? messageScan(err.scan) : messageErreur(err));
+    Object.assign(g, { etat: "erreur", message: err?.scan ? messageScan(err.scan) : messageErreur(err) });
   }
+  if (lot !== monLot) return liberer(g);
+  afficherGroupe(g);
+  finLot();
 });
 
 // ---- Fondateur : statistiques ----

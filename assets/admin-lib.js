@@ -236,7 +236,7 @@ export function dejaSurLokal(b, existants, lieu) {
 // Messages d'erreur du scan (mêmes codes que la fonction « lire-affiche »).
 export function messageScan(code) {
   return {
-    limite: "Plafond atteint : 30 scans par jour et par personne.",
+    limite: "Plafond atteint : 300 scans par jour pour l'équipe Lokal.",
     pas_de_cle: "Le scan n'est pas encore branché sur le serveur.",
     occupe: "Le serveur est occupé. Réessaie dans un instant.",
     admin: "Lire un texte ou un lien est réservé à l'équipe Lokal.",

@@ -175,6 +175,8 @@ textarea.champ { height: 110px; padding: 12px 14px; resize: vertical; }
 .vignette { max-width: 180px; max-height: 240px; width: auto; height: auto; border-radius: var(--r-champ); border: 1.5px solid var(--line); }
 .bandeau { display: grid; gap: 4px; justify-items: start; padding: 10px 12px; border-radius: var(--r-champ); background: var(--rose); color: #fff; font-size: 14px; }
 .bandeau.danger { background: var(--danger); }
+.groupe-scan + .groupe-scan { border-top: 2px solid var(--line); padding-top: 16px; margin-top: 4px; }
+.groupe-scan .kicker .detail { overflow-wrap: anywhere; }
 .bandeau .btn { margin-top: 4px; }
 .titre-ev { display: flex; align-items: center; gap: 10px; font-weight: 600; }
 .membre .titre-ev { font-weight: 700; }
