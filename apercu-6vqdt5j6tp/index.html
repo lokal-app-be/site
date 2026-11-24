@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://ggubfbpiqmbzakyywezf.supabase.co https://www.odwb.be https://agendabrussels2.imgix.net; connect-src 'self' https://ggubfbpiqmbzakyywezf.supabase.co https://tiles.openfreemap.org; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<title>Lokal · Les sorties autour de toi, sur une carte</title>
+<meta name="description" content="Soirées, fêtes de village, culture, sport, jeux : Lokal montre sur une carte toutes les sorties autour de toi en Belgique. Ton agenda Lokal dans ta poche.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lokal">
+<meta property="og:locale" content="fr_BE">
+<meta property="og:url" content="https://lokalapp.be/">
+<meta property="og:title" content="Lokal · Les sorties autour de toi, sur une carte">
+<meta property="og:description" content="Soirées, fêtes de village, culture, sport, jeux : toutes les sorties autour de toi en Belgique. Ton agenda Lokal dans ta poche.">
+<meta property="og:image" content="https://lokalapp.be/partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Logo Lokal">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/apercu-6vqdt5j6tp/assets/polices/rubik-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/apercu-6vqdt5j6tp/assets/site.css">
+<link rel="stylesheet" href="/apercu-6vqdt5j6tp/assets/maplibre/maplibre-gl.css">
+<link rel="stylesheet" href="/apercu-6vqdt5j6tp/assets/accueil.css">
+<script src="/apercu-6vqdt5j6tp/assets/maplibre/maplibre-gl-csp.js" defer></script>
+<script type="module" src="/apercu-6vqdt5j6tp/assets/page.js"></script>
+<script type="module" src="/apercu-6vqdt5j6tp/assets/accueil.js"></script>
+</head>
+<body>
+
+<header class="tete cadre">
+  <a class="marque" href="/apercu-6vqdt5j6tp/" aria-label="Lokal, accueil"><img src="/apercu-6vqdt5j6tp/assets/images/lokal.png" width="360" height="114" alt="Lokal."></a>
+  <nav class="nav" aria-label="Menu">
+    <a class="lien" href="#carte">La carte</a>
+    <a class="lien" href="/apercu-6vqdt5j6tp/organisateurs">Organisateurs</a>
+    <a class="lien" href="/apercu-6vqdt5j6tp/communes">Communes et salles</a>
+    <span class="bientot petit">Bientôt sur Android et iPhone</span>
+  </nav>
+</header>
+
+<main>
+<section class="hero cadre" aria-roledescription="carrousel" aria-label="Découvrir Lokal">
+  <div class="piste" id="piste" tabindex="0" aria-live="polite">
+
+    <article class="slide" aria-roledescription="diapositive" aria-label="1 sur 4">
+      <div class="texte">
+        <p class="kicker">Ce soir, demain, ce week-end…</p>
+        <h1>Toutes les sorties autour de toi, <em>sur une carte</em></h1>
+        <p>Soirées, fêtes de village, culture, sport, jeux. Lokal rassemble tout ce qui se passe près de chez toi, partout en Belgique.</p>
+        <div class="boutons"><a class="btn" href="#carte">Voir la carte</a></div>
+      </div>
+      <div class="collage" aria-hidden="true">
+        <div class="photo"><img src="/apercu-6vqdt5j6tp/assets/images/carte-tellin.webp" width="640" height="500" alt=""></div>
+        <div class="evc c2"><span class="ico" data-icone="sport"></span><div class="evc-t"><div class="pills"><span class="pdate">SAM. · 18:30</span><span class="certif">✓ Certifié</span></div><b>Trail nocturne à la frontale</b><small>Place de Resteigne · 2,9 km</small></div></div>
+      </div>
+    </article>
+
+    <article class="slide" aria-roledescription="diapositive" aria-label="2 sur 4">
+      <div class="texte">
+        <p class="kicker">En une minute…</p>
+        <h2>Installe Lokal, <em>c'est gratuit</em></h2>
+        <ol class="etapes">
+          <li>Scanne le QR avec ton téléphone, ou cherche « Lokal » dans le Play Store ou l'App Store.</li>
+          <li>Ouvre l'appli : la carte s'affiche tout de suite.</li>
+          <li>Autorise ta position, ou choisis ton village.</li>
+        </ol>
+        <!-- Les QR codes restent floutés et sans lien tant que l'appli n'est pas sur les stores (règle d'Arnaud). -->
+        <div class="qrs">
+          <div class="qr"><div class="qr-img"><img src="/apercu-6vqdt5j6tp/assets/images/qr-attente.svg" width="104" height="104" alt=""><span class="qr-voile">Actif au lancement</span></div><b>Google Play</b><small>Android</small></div>
+          <div class="qr"><div class="qr-img"><img src="/apercu-6vqdt5j6tp/assets/images/qr-attente.svg" width="104" height="104" alt=""><span class="qr-voile">Actif au lancement</span></div><b>App Store</b><small>iPhone</small></div>
+        </div>
+      </div>
+      <div class="collage" aria-hidden="true">
+        <div class="capture"><img src="/apercu-6vqdt5j6tp/assets/images/appli-carte.webp" width="480" height="700" alt=""></div>
+        <div class="rond-gratuit"><b>Gratuit</b><small>Android et iPhone</small></div>
+      </div>
+    </article>
+
+    <article class="slide" id="organisateurs" aria-roledescription="diapositive" aria-label="3 sur 4">
+      <div class="texte">
+        <p class="kicker">Bal, souper, tournoi…</p>
+        <h2>Mets ton événement <em>en avant</em></h2>
+        <p>Bal, souper, tournoi, concert : publie-le depuis le site ou l'appli, en une minute. Il apparaît sur la carte, marqué « Certifié », avec ton affiche.</p>
+        <div class="boutons"><a class="btn" href="/apercu-6vqdt5j6tp/organisateurs">Comment ajouter mon événement</a></div>
+      </div>
+      <div class="collage" aria-hidden="true">
+        <div class="affiche-b"><div class="aff"><span>Trail nocturne à la frontale</span><small>Sam. · 18:30 · Place de Resteigne</small></div>
+          <div class="sous"><div class="pills"><span class="ico petit" data-icone="sport"></span><span class="pdate">SAM. · 18:30</span><span class="certif">✓ Certifié</span></div><b>Trail nocturne à la frontale</b>
+          <div class="duo"><span class="btn">J'y vais !</span><span class="btn sec">Intéressé</span></div></div></div>
+      </div>
+    </article>
+
+    <article class="slide" id="communes" aria-roledescription="diapositive" aria-label="4 sur 4">
+      <div class="texte">
+        <p class="kicker">Commune, salle, professionnel ?</p>
+        <h2>Votre agenda Lokal <em>sur votre site web</em></h2>
+        <p>Un agenda Lokal à ajouter directement sur votre site. Vos événements y sont toujours à jour, sans rien recopier.</p>
+        <div class="boutons"><a class="btn" href="/apercu-6vqdt5j6tp/communes">Voir le module</a><a class="btn sec" href="mailto:contact@lokalapp.be?subject=Demande%20de%20devis%20%3A%20agenda%20Lokal%20sur%20notre%20site">Demander un devis</a></div>
+        <p class="adresse">ou écrivez à <b>contact@lokalapp.be</b></p>
+      </div>
+      <div class="collage" aria-hidden="true">
+        <div class="navig">
+          <div class="barre"><i></i><i></i><i></i><span class="url">votre-commune.be/agenda</span></div>
+          <div class="site">
+            <div class="site-tete"><b>Commune de Tellin</b><span>Agenda · avec Lokal</span></div>
+            <div class="evc"><span class="ico" data-icone="fete"></span><div class="evc-t"><div class="pills"><span class="pdate">VEN. · 20:00</span></div><b>Souper du foot</b><small>Salle de Bure</small></div></div>
+            <div class="evc"><span class="ico" data-icone="culture"></span><div class="evc-t"><div class="pills"><span class="pdate">SAM. · 14:00</span><span class="certif">✓ Certifié</span></div><b>Marché de Noël</b><small>Place de Resteigne</small></div></div>
+            <div class="evc"><span class="ico" data-icone="jeux"></span><div class="evc-t"><div class="pills"><span class="pdate">DIM. · 15:00</span></div><b>Après-midi jeux</b><small>Grupont</small></div></div>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="cmd">
+    <div class="points" id="points" role="tablist" aria-label="Choisir une diapositive"></div>
+    <div class="fleches">
+      <button class="rond" id="prec" type="button" aria-label="Diapositive précédente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="rond" id="suiv" type="button" aria-label="Diapositive suivante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </div>
+
+  <a class="vers-carte" href="#carte">La carte des événements
+    <span class="f"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14m0 0-6-6m6 6 6-6"/></svg></span>
+  </a>
+</section>
+
+<section class="sec-carte cadre" id="carte" aria-labelledby="titre-carte">
+  <div class="barre-carte">
+    <h2 class="titre-carte" id="titre-carte">La carte des événements</h2>
+    <div class="recherche" role="search">
+      <label for="q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <span class="cache">Rechercher un village ou un événement</span>
+        <input id="q" type="search" autocomplete="off" placeholder="Village ou événement" aria-controls="suggestions" aria-autocomplete="list" aria-expanded="false" enterkeyhint="search"></label>
+      <ul class="suggestions" id="suggestions" role="listbox" aria-label="Résultats" hidden></ul>
+    </div>
+    <div class="puces" role="group" aria-label="Quand">
+      <button type="button" class="chip" data-mode="today" aria-pressed="false">Aujourd'hui</button>
+      <button type="button" class="chip actif" data-mode="weekend" aria-pressed="true">Ce week-end</button>
+      <span class="puce-date"><button type="button" class="chip" data-mode="date" aria-pressed="false" id="puce-date" tabindex="-1">Autre date</button><input type="date" id="autre-date" aria-label="Choisir une autre date"></span>
+    </div>
+    <a class="btn ajouter" href="/apercu-6vqdt5j6tp/ajouter">+ Ajouter un événement</a>
+  </div>
+
+  <div class="zone" id="zone">
+    <div class="bloc carte" id="map" role="region" aria-label="Carte des événements">
+      <p class="etat-carte" id="etat-carte" role="status">Chargement des sorties…</p>
+      <div class="boutons-carte">
+        <div class="zoom" role="group" aria-label="Zoom de la carte">
+          <button class="rond" id="zoom-plus" type="button" aria-label="Zoomer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="rond" id="zoom-moins" type="button" aria-label="Dézoomer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+        </div>
+        <button class="rond" id="ma-position" type="button" aria-label="Autour de moi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+      </div>
+    </div>
+    <aside class="bloc panneau" id="panneau" hidden aria-label="Fiche de l'événement"></aside>
+  </div>
+</section>
+</main>
+
+<footer class="pied cadre">
+  <div class="pied-grille">
+    <div class="pied-marque">
+      <img src="/apercu-6vqdt5j6tp/assets/images/lokal.png" width="360" height="114" alt="Lokal.">
+      <p>Ton agenda Lokal dans ta poche. Toutes les sorties autour de toi, en Belgique.</p>
+    </div>
+    <div><h2>L'appli</h2><ul><li><span>Bientôt sur Android et iPhone</span></li><li><a href="/apercu-6vqdt5j6tp/#carte">La carte</a></li></ul></div>
+    <div><h2>Organisateurs</h2><ul><li><a href="/apercu-6vqdt5j6tp/ajouter">Ajouter un événement</a></li><li><a href="/apercu-6vqdt5j6tp/organisateurs">Comment ça marche</a></li><li><a href="/apercu-6vqdt5j6tp/communes">Communes et salles</a></li><li><a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a></li></ul></div>
+    <div><h2>Infos</h2><ul><li><a href="/apercu-6vqdt5j6tp/mentions-legales">Mentions légales</a></li><li><a href="/apercu-6vqdt5j6tp/confidentialite">Confidentialité</a></li><li><a href="/apercu-6vqdt5j6tp/conditions">Conditions d'utilisation</a></li><li><a href="/apercu-6vqdt5j6tp/supprimer-compte">Supprimer mon compte</a></li></ul></div>
+  </div>
+  <div class="bas"><span>© 2026 Lokal · Carte © contributeurs OpenStreetMap</span><button class="haut" id="haut" type="button"><span class="rond petit" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></span>Remonter en haut</button></div>
+</footer>
+
+</body>
+</html>
