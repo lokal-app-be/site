@@ -3,8 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   aujourdhuiBelgique, joursDuWeekend, periode, dansPeriode, pastilleDate, bientot, ajouterJours, depuisLigne, urlAffiche,
-  imageAgendaOk, texteEntree, adresseComplete, lireLieux, chercherLieux, distanceKm, ecarter, TELLIN, svgIcone,
-} from "../assets/lokal.js";
+  imageAgendaOk, texteEntree, adresseComplete, lireLieux, chercherLieux, distanceKm, ecarter, TELLIN, svgIcone, positionUtilisable } from "../assets/lokal.js";
 
 test("aujourd'hui est la date belge, pas celle de l'ordinateur", () => {
   assert.equal(aujourdhuiBelgique(new Date("2026-11-22T23:30:00Z")), "2026-11-23"); // 0 h 30 à Bruxelles
@@ -68,4 +67,12 @@ test("Tellin par défaut, jamais Bruxelles ; distances ; points écartés à la 
 test("les icônes sont le dessin fixe de l'appli (aucune donnée dedans)", () => {
   assert.match(svgIcone("fete"), /^<svg /);
   assert.equal(svgIcone("<script>"), svgIcone("autre"));
+});
+
+test("bouton Ma position : précise et en Belgique seulement", () => {
+  assert.equal(positionUtilisable(50.16, 5.22, 30), "ok"); // Rochefort, GPS
+  assert.equal(positionUtilisable(50.16, 5.22, 2500), "ok");
+  assert.equal(positionUtilisable(50.88, 4.7, 20000), "floue"); // devinée par le réseau
+  assert.equal(positionUtilisable(50.16, 5.22, undefined), "floue");
+  assert.equal(positionUtilisable(48.85, 2.35, 20), "hors"); // Paris
 });

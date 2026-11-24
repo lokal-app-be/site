@@ -1,6 +1,6 @@
 // Accueil de lokalapp.be : le carrousel, puis la carte des événements (MapLibre + OpenFreeMap) et la fiche d'un événement.
 import {
-  SUPABASE_URL, SUPABASE_CLE, TELLIN, CATEGORIES, COLONNES, svgIcone, depuisLigne, ecarter,
+  SUPABASE_URL, SUPABASE_CLE, TELLIN, CATEGORIES, COLONNES, svgIcone, depuisLigne, ecarter, positionUtilisable,
   aujourdhuiBelgique, periode, dansPeriode, pastilleDate, bientot, formatJour, texteEntree, texteQuand,
   adresseComplete, distanceKm, formatKm, lireLieux, chercherLieux, libelleLieu,
 } from "./lokal.js";
@@ -184,8 +184,10 @@ async function demarrerCarte() {
   carte = new ml.Map({
     container: "map",
     style: prep.style,
-    center: [TELLIN.lng, TELLIN.lat], // jamais Bruxelles : Tellin tant que la personne ne donne pas sa position
-    zoom: 12,
+    // Jamais Bruxelles : Tellin tant que la personne ne donne pas sa position. À l'arrivée, la carte est dézoomée
+    // (demande d'Arnaud du 24 nov. 2026) : la même zone autour de Tellin sur chaque écran (environ 18 km
+    // à l'est et à l'ouest, 15 km au nord et au sud), de Rochefort à Saint-Hubert.
+    bounds: [[TELLIN.lng - 0.25, TELLIN.lat - 0.14], [TELLIN.lng + 0.25, TELLIN.lat + 0.14]],
     minZoom: 7,
     maxZoom: 18,
     maxBounds: [[1.6, 48.9], [7.4, 52.1]],
@@ -548,16 +550,23 @@ $("#zoom-moins").addEventListener("click", () => carte?.zoomOut({ duration: doux
 
 $("#ma-position").addEventListener("click", () => {
   if (!navigator.geolocation) return etat("Ta position n'est pas disponible sur ce navigateur.");
+  const dire = (texte) => {
+    etat(texte);
+    setTimeout(() => etat(""), 7000);
+  };
+  // Position précise et récente (bug du 24 nov. 2026 : à Rochefort, la carte partait vers Louvain). Sans précision,
+  // le navigateur peut donner une position devinée par le réseau, ou une ancienne position gardée en mémoire.
   navigator.geolocation.getCurrentPosition(
     (p) => {
-      position = { lat: p.coords.latitude, lng: p.coords.longitude };
-      if (carte) carte.flyTo({ center: [position.lng, position.lat], zoom: 13.5, duration: doux ? 900 : 0 });
+      const { latitude: lat, longitude: lng, accuracy } = p.coords;
+      const precision = positionUtilisable(lat, lng, accuracy);
+      if (precision === "hors") return dire("Ta position est en dehors de la Belgique : la carte ne bouge pas. Tu peux chercher ton village.");
+      if (precision === "floue") return dire(`Ta position n'est pas assez précise (à environ ${Math.round(accuracy / 1000)} km près). Active la localisation précise, ou cherche ton village.`);
+      position = { lat, lng };
+      if (carte) carte.flyTo({ center: [lng, lat], zoom: 13.5, duration: doux ? 900 : 0 });
     },
-    () => {
-      etat("Position refusée : la carte reste sur Tellin. Tu peux chercher ton village.");
-      setTimeout(() => etat(""), 5000);
-    },
-    { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 },
+    () => dire("Position refusée ou introuvable : la carte ne bouge pas. Tu peux chercher ton village."),
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
   );
 });
 

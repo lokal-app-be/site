@@ -298,3 +298,12 @@ export function chercherLieux(q, lieux, max = 8) {
   scored.sort((a, b) => a.s - b.s || a.l.nom.localeCompare(b.l.nom, "fr"));
   return scored.slice(0, max).map((x) => x.l);
 }
+
+// Bouton « Ma position » du site : « ok », « floue » (à plus de 3 km près : position devinée par le réseau),
+// ou « hors » (en dehors de la zone de la carte, Belgique et ses bords).
+export const PRECISION_MAX_M = 3000;
+export function positionUtilisable(lat, lng, precisionM) {
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < 49.4 || lat > 51.6 || lng < 2.4 || lng > 6.5) return "hors";
+  if (!Number.isFinite(precisionM) || precisionM > PRECISION_MAX_M) return "floue";
+  return "ok";
+}
