@@ -404,7 +404,12 @@ CHARGEURS.retires = async (silencieux) => {
       el(
         "tr",
         {},
-        el("td", {}, el("span", { class: "titre-ev" }, icone(d.get(r.evenement)?.categorie ?? "autre", true), r.titre)),
+        el(
+          "td",
+          {},
+          el("span", { class: "titre-ev" }, icone(d.get(r.evenement)?.categorie ?? "autre", true), r.titre),
+          r.note ? el("p", { class: "note-retrait", texte: `Note : « ${r.note} »` }) : null,
+        ),
         el("td", { "data-t": "Organisateur", texte: r.organisateur }),
         el("td", { "data-t": "Date", texte: `${formatJour(r.date_debut)} · ${r.village}` }),
         el("td", { "data-t": "Retiré le", texte: [r.retire_le ? jourCourt(r.retire_le) : "—", r.nb ? pluriel(r.nb, "signalement") : ""].filter(Boolean).join(" · ") }),
@@ -416,12 +421,54 @@ CHARGEURS.retires = async (silencieux) => {
             { class: "actions" },
             el("button", { class: "btn sec petit", type: "button", texte: "Remettre", onclick: () => decider(r.evenement, r.titre, "remettre") }),
             el("button", { class: "btn sec petit", type: "button", texte: "Voir", onclick: () => voir(r.evenement) }),
+            el("button", { class: "btn sec petit", type: "button", texte: r.note ? "Modifier la note" : "Ajouter une note", onclick: () => noterRetrait(r) }),
           ),
         ),
       ),
     ),
   );
 };
+
+// Note de l'équipe sur un retrait (demande d'Arnaud du 24 nov. 2026), visible seulement par l'équipe Lokal.
+const NOTE_MAX = 200;
+function noterRetrait(r) {
+  const champ = el("textarea", { class: "champ", rows: 3, maxlength: NOTE_MAX, placeholder: "Par exemple : ne correspond pas", "aria-label": "Note" });
+  champ.value = r.note ?? "";
+  const erreur = el("p", { class: "erreur", role: "alert", hidden: true });
+  const enregistrer = el("button", {
+    class: "btn petit",
+    type: "button",
+    texte: "Enregistrer",
+    onclick: async () => {
+      enregistrer.disabled = true;
+      erreur.hidden = true;
+      try {
+        const { error } = await sb().rpc("admin_noter_retrait", { ev: r.evenement, note: champ.value.trim().slice(0, NOTE_MAX) });
+        if (error) throw error;
+        fenetre.close();
+        toast(champ.value.trim() ? "Note enregistrée" : "Note effacée");
+        charger("retires");
+      } catch (err) {
+        erreur.textContent = messageErreur(err);
+        erreur.hidden = false;
+        enregistrer.disabled = false;
+      }
+    },
+  });
+  vider(
+    corpsFenetre,
+    el("h2", { id: "f-titre", texte: "Note sur ce retrait" }),
+    el("p", { class: "detail", texte: `« ${r.titre} » · ${formatJour(r.date_debut)} · ${r.village}` }),
+    champ,
+    el("p", { class: "note", texte: `Visible seulement par l'équipe Lokal, pas par l'organisateur. ${NOTE_MAX} caractères au plus. Laisse vide pour effacer la note.` }),
+    erreur,
+    el("div", { class: "actions" }, enregistrer, el("button", { class: "btn sec petit", type: "button", texte: "Annuler", onclick: () => fenetre.close() })),
+  );
+  fermerFenetre.hidden = true;
+  fenetre.addEventListener("close", () => (fermerFenetre.hidden = false), { once: true });
+  fenetre.showModal();
+  champ.focus();
+}
 
 // ---- Scanner un panneau, un texte ou un lien (comme l'appli, mode équipe Lokal) ----
 let scan = null; // { prets, mauvaise, source }
