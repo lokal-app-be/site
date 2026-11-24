@@ -114,8 +114,16 @@
   </section>
 
   <section class="bloc carte-compte miens" id="miens" hidden aria-labelledby="t-miens">
-    <div class="miens-tete"><h2 class="cs-titre" id="t-miens">Mes événements</h2><a class="btn petit" href="/ajouter">+ Ajouter</a></div>
-    <div id="liste-miens" class="liste-miens"></div>
+    <!-- Deux listes qui se déplient (demande d'Arnaud du 24 nov. 2026), repliées au départ, avec leur nombre. -->
+    <details class="depliant" id="d-miens">
+      <summary><h2 class="cs-titre" id="t-miens">Mes événements</h2><span class="nombre" id="n-miens" hidden></span></summary>
+      <div id="liste-miens" class="liste-miens"></div>
+    </details>
+    <details class="depliant" id="d-scannes" hidden>
+      <summary><h2 class="cs-titre">Scannés par toi</h2><span class="nombre" id="n-scannes"></span></summary>
+      <div id="liste-scannes" class="liste-miens"></div>
+    </details>
+    <div><a class="btn petit" href="/ajouter">+ Ajouter un événement</a></div>
   </section>
 
   <section class="bloc carte-compte danger-compte" id="supprimer" hidden aria-labelledby="t-supprimer">
