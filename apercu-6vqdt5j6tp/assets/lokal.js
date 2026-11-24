@@ -298,3 +298,4 @@ export function chercherLieux(q, lieux, max = 8) {
   scored.sort((a, b) => a.s - b.s || a.l.nom.localeCompare(b.l.nom, "fr"));
   return scored.slice(0, max).map((x) => x.l);
 }
+
