@@ -160,3 +160,21 @@ export async function nouveauMotDePasse(email, code, motDePasse) {
   const u = await sb().auth.updateUser({ password: motDePasse });
   if (u.error) throw u.error;
 }
+
+// ---- Mon compte : mes événements (comme « Mes événements » de l'appli) ----
+// L'état affiché à côté d'un de mes événements, et s'il peut s'ouvrir sur la carte publique du site.
+export function etatMien(e, aujourdhui) {
+  const passe = (e.dateFin || e.date) < aujourdhui;
+  if (e.visibilite === "retire") return { texte: "Retiré par l'équipe Lokal", alerte: true, carte: false, passe };
+  if (e.visibilite === "masque") return { texte: "Caché pendant une vérification", alerte: true, carte: false, passe };
+  if (e.statut === "annule") return { texte: "Annulé", alerte: true, carte: false, passe };
+  if (passe) return { texte: "Passé", alerte: false, carte: false, passe };
+  if (e.prive) return { texte: "Privé", alerte: false, carte: false, passe };
+  return { texte: null, alerte: false, carte: true, passe };
+}
+// À venir d'abord (par date), puis les passés ; à part, « Scannés par toi » (affiches et imports).
+export function trierMiens(liste, aujourdhui) {
+  const passe = (e) => (e.dateFin || e.date) < aujourdhui;
+  const tries = [...liste].sort((a, b) => Number(passe(a)) - Number(passe(b)) || `${a.date} ${a.heure || ""}`.localeCompare(`${b.date} ${b.heure || ""}`) || a.titre.localeCompare(b.titre));
+  return { miens: tries.filter((e) => e.source === "appli"), scannes: tries.filter((e) => e.source !== "appli") };
+}
