@@ -654,15 +654,24 @@ function afficherGroupe(g) {
           : p.doublon
             ? el("div", { class: "bandeau" }, el("b", { texte: "Déjà sur Lokal" }), el("span", { texte: "Ton scan confirme l'événement. Il n'est pas publié une deuxième fois." }), el("button", { class: "btn sec petit", type: "button", texte: "Voir l'événement", onclick: () => voir(p.doublon.id) }))
             : null,
-        p.url ? el("img", { class: "vignette", src: p.url, alt: "L'affiche recadrée" }) : null,
-        ligne("Date", b.dateFin ? `Du ${formatJour(b.date)} au ${formatJour(b.dateFin)}` : formatJour(b.date)),
-        ligne("Heure", b.heureFin ? `${b.heure} → ${b.heureFin}` : b.heure),
-        ligne("Lieu", [b.lieu, p.lieu ? libelleLieu(p.lieu) : b.village || "à préciser"].filter(Boolean).join(", ")),
-        ligne("Organisateur", b.organisateur),
-        b.prixTexte ? ligne("Prix", b.prixTexte) : null,
-        ligne("Mail", b.email || "aucun sur l'affiche"),
-        b.description ? ligne("Infos", b.description) : null,
-        b.resume ? el("p", { class: "note", texte: "Résumé de l'affiche en quelques lignes. Une fois certifié, l'organisateur pourra mettre son texte complet." }) : null,
+        // L'affiche à côté de ce qui a été lu (l'une sous l'autre quand la place manque), pour comparer.
+        el(
+          "div",
+          { class: "lu-corps" },
+          p.url ? el("img", { class: "vignette", src: p.url, alt: "L'affiche recadrée" }) : null,
+          el(
+            "div",
+            { class: "lu-infos" },
+            ligne("Date", b.dateFin ? `Du ${formatJour(b.date)} au ${formatJour(b.dateFin)}` : formatJour(b.date)),
+            ligne("Heure", b.heureFin ? `${b.heure} → ${b.heureFin}` : b.heure),
+            ligne("Lieu", [b.lieu, p.lieu ? libelleLieu(p.lieu) : b.village || "à préciser"].filter(Boolean).join(", ")),
+            ligne("Organisateur", b.organisateur),
+            b.prixTexte ? ligne("Prix", b.prixTexte) : null,
+            ligne("Mail", b.email || "aucun sur l'affiche"),
+            b.description ? ligne("Infos", b.description) : null,
+            b.resume ? el("p", { class: "note", texte: "Résumé de l'affiche en quelques lignes. Une fois certifié, l'organisateur pourra mettre son texte complet." }) : null,
+          ),
+        ),
       );
       if (!b.passe && !p.doublon && !p.lieu) choisirVillage(g, p, corps);
       const caseP = !b.passe && !p.doublon
