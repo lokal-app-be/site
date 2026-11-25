@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import {
   texteMotif, lireActivite, resumeActivite, detailAlerte, parCommune, communeDuVillage, nomSource, lirePrixTexte, versBrouillons,
   trouverLieu, titresProches, dejaSurLokal, messageScan, cadreValide, cadrePixels, tailleScan, natureTexte, texteOrigine, pluriel,
-  filtrerNonCertifies, dureeImport, emailAdminValide, formatNombre, LIGNES_STATS,
+  filtrerNonCertifies, dureeImport, emailAdminValide, formatNombre, LIGNES_STATS, partsEcrans,
 } from "../assets/admin-lib.js";
 import { lireLieux } from "../assets/lokal.js";
 
@@ -117,4 +117,12 @@ test("imports et équipe", () => {
   assert.equal(dureeImport("2026-11-23T12:00:00Z", null), "");
   assert.equal(emailAdminValide("camille@gmail.com"), true);
   assert.equal(emailAdminValide("camille@gmail"), false);
+});
+
+test("écrans les plus vus : en % de toutes les vues", () => {
+  const p = partsEcrans([["carte", 600], ["fiche", 395], ["profil", 5]]);
+  assert.deepEqual(p.map((x) => x.texte), ["60 %", "40 %", "< 1 %"]);
+  assert.equal(partsEcrans([["carte", 3], ["fiche", 1]])[0].texte, "75 %");
+  assert.deepEqual(partsEcrans([]), []);
+  assert.equal(partsEcrans([["carte", 0]])[0].texte, "0 %");
 });

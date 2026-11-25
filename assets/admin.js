@@ -8,7 +8,7 @@ import {
   libelleLieu, chercherLieux, adresseComplete, texteEntree, texteQuand, pastilleDate,
 } from "./lokal.js";
 import {
-  texteMotif, SIGNALEMENTS_POUR_MASQUER, LIGNES_STATS, formatNombre, lireActivite, NOMS_ECRANS, JOURS_COURTS, resumeActivite,
+  texteMotif, SIGNALEMENTS_POUR_MASQUER, LIGNES_STATS, formatNombre, lireActivite, NOMS_ECRANS, partsEcrans, JOURS_COURTS, resumeActivite,
   detailAlerte, parCommune, communeDuVillage, nomSource, lienSourceValide, versBrouillons, trouverLieu, dejaSurLokal, messageScan,
   cadrePixels, tailleScan, natureTexte, texteOrigine, pluriel, filtrerNonCertifies, dureeImport, emailAdminValide,
 } from "./admin-lib.js";
@@ -930,15 +930,21 @@ CHARGEURS.usage = async () => {
   vider($("axe-heures"), ...a.ouverturesHeure.map((_, h) => el("span", { texte: String(h) })));
   barres($("jours"), a.ouverturesJour, (j, v) => `${JOURS_COURTS[j]} : ${fois(v)}`);
   vider($("axe-jours"), ...JOURS_COURTS.map((j) => el("span", { texte: j })));
-  const maxE = Math.max(1, ...a.ecrans.map(([, v]) => v));
+  const parts = partsEcrans(a.ecrans);
+  const maxP = Math.max(1, ...parts.map((x) => x.pct));
   vider(
     $("ecrans"),
-    ...(a.ecrans.length
-      ? a.ecrans.slice(0, 10).map(([k, v]) => {
-          const barre = el("span", { class: "mini-barre" }, el("i"));
-          barre.firstChild.style.width = `${(v / maxE) * 100}%`;
-          return el("div", { class: "ecran-ligne" }, el("span", { texte: NOMS_ECRANS[k] ?? k }), barre, el("b", { class: "nb", texte: formatNombre(v) }));
-        })
+    ...(parts.length
+      ? [
+          ...parts.slice(0, 10).map((x) => {
+            const barre = el("span", { class: "mini-barre" }, el("i"));
+            barre.firstChild.style.width = `${(x.pct / maxP) * 100}%`;
+            const ligne = el("div", { class: "ecran-ligne" }, el("span", { texte: NOMS_ECRANS[x.k] ?? x.k }), barre, el("b", { class: "nb", texte: x.texte }));
+            ligne.title = `${NOMS_ECRANS[x.k] ?? x.k} : ${x.texte} des vues (${formatNombre(x.v)})`;
+            return ligne;
+          }),
+          el("p", { class: "note", texte: "En % de toutes les vues d'écran des 4 dernières semaines." }),
+        ]
       : [el("p", { class: "note", texte: "Pas encore de données." })]),
   );
   const t = el(

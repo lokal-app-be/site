@@ -43,6 +43,15 @@ export function lireActivite(d) {
     ecrans: Object.entries(d.ecrans ?? {}).map(([k, v]) => [k, Number(v) || 0]).sort((a, b) => b[1] - a[1]),
   };
 }
+// Écrans les plus vus, en % de toutes les vues d'écran (demande d'Arnaud du 25 nov. 2026).
+// Arrondi à l'unité ; un écran vu mais sous 1 % affiche « < 1 % » plutôt que 0 %.
+export function partsEcrans(ecrans) {
+  const total = ecrans.reduce((t, [, v]) => t + v, 0);
+  return ecrans.map(([k, v]) => {
+    const pct = total ? (v / total) * 100 : 0;
+    return { k, v, pct, texte: v > 0 && pct < 1 ? "< 1 %" : `${Math.round(pct)} %` };
+  });
+}
 export const NOMS_ECRANS = {
   carte: "Carte", liste: "Liste", fiche: "Fiche d'un événement", ajouter: "Ajouter / Modifier", scan: "Scanner une affiche",
   profil: "Profil", amis: "Amis", messages: "Messages", notifications: "Notifications", "week-end": "Ce week-end à…",
