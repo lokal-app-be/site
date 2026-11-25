@@ -43,6 +43,15 @@ export function lireActivite(d) {
     ecrans: Object.entries(d.ecrans ?? {}).map(([k, v]) => [k, Number(v) || 0]).sort((a, b) => b[1] - a[1]),
   };
 }
+// Écrans les plus vus, en % de toutes les vues d'écran (demande d'Arnaud du 25 nov. 2026).
+// Arrondi à l'unité ; un écran vu mais sous 1 % affiche « < 1 % » plutôt que 0 %.
+export function partsEcrans(ecrans) {
+  const total = ecrans.reduce((t, [, v]) => t + v, 0);
+  return ecrans.map(([k, v]) => {
+    const pct = total ? (v / total) * 100 : 0;
+    return { k, v, pct, texte: v > 0 && pct < 1 ? "< 1 %" : `${Math.round(pct)} %` };
+  });
+}
 export const NOMS_ECRANS = {
   carte: "Carte", liste: "Liste", fiche: "Fiche d'un événement", ajouter: "Ajouter / Modifier", scan: "Scanner une affiche",
   profil: "Profil", amis: "Amis", messages: "Messages", notifications: "Notifications", "week-end": "Ce week-end à…",
@@ -249,3 +258,30 @@ export function messageScan(code) {
 
 // Inviter un admin : une adresse complète (même règle que l'appli).
 export const emailAdminValide = (t) => /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(t.trim()) && t.trim().length <= 254;
+
+// ---- Code Google Authenticator de l'équipe (comme l'appli, décision d'Arnaud du 24 nov. 2026) ----
+// Réponse de admin_statut() : « non », « code_a_creer », « code_a_taper » ou « ok ». Tout le reste : « non ».
+export const lireStatutAdmin = (v) => (["code_a_creer", "code_a_taper", "ok"].includes(v) ? v : "non");
+export const codeValide = (s) => /^\d{6}$/.test(String(s ?? "").trim());
+export function messageErreurCode(e) {
+  const m = e && typeof e === "object" && "message" in e ? String(e.message) : "";
+  const code = e && typeof e === "object" && "code" in e ? String(e.code) : "";
+  if (code === "mfa_verification_failed" || /invalid|expired/i.test(m)) return "Ce code n'est pas bon. Prends le code affiché maintenant dans Google Authenticator.";
+  if (/network|fetch|Failed/i.test(m)) return "Pas de connexion. Vérifie ton internet et réessaie.";
+  return "Ça n'a pas marché. Réessaie dans un instant.";
+}
+// Le carré QR envoyé par Supabase (« data:image/svg+xml;utf-8,<svg…> ») : on ré-encode le dessin pour que
+// tous les navigateurs l'affichent. Seule une image SVG fournie ainsi est acceptée, jamais une adresse.
+export function imageQr(brut) {
+  const m = /^data:image\/svg\+xml(?:;[^,]*)?,([\s\S]*)$/.exec(String(brut ?? ""));
+  if (!m) return "";
+  let svg = m[1];
+  if (!svg.trimStart().startsWith("<")) {
+    try {
+      svg = decodeURIComponent(svg);
+    } catch {
+      return "";
+    }
+  }
+  return svg.trimStart().startsWith("<svg") || svg.trimStart().startsWith("<?xml") ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}` : "";
+}

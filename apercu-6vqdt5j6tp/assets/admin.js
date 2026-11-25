@@ -8,7 +8,7 @@ import {
   libelleLieu, chercherLieux, adresseComplete, texteEntree, texteQuand, pastilleDate,
 } from "./lokal.js";
 import {
-  texteMotif, SIGNALEMENTS_POUR_MASQUER, LIGNES_STATS, formatNombre, lireActivite, NOMS_ECRANS, JOURS_COURTS, resumeActivite,
+  texteMotif, SIGNALEMENTS_POUR_MASQUER, LIGNES_STATS, formatNombre, lireActivite, NOMS_ECRANS, partsEcrans, lireStatutAdmin, codeValide, messageErreurCode, imageQr, JOURS_COURTS, resumeActivite,
   detailAlerte, parCommune, communeDuVillage, nomSource, lienSourceValide, versBrouillons, trouverLieu, dejaSurLokal, messageScan,
   cadrePixels, tailleScan, natureTexte, texteOrigine, pluriel, filtrerNonCertifies, dureeImport, emailAdminValide,
 } from "./admin-lib.js";
@@ -117,7 +117,7 @@ async function voir(id) {
 }
 
 // ---- Les écrans ----
-const ECRANS = ["ecran-connexion", "ecran-refus", "ecran-attente", "ecran-admin"];
+const ECRANS = ["ecran-connexion", "ecran-refus", "ecran-code", "ecran-attente", "ecran-admin"];
 const montrer = (id) => ECRANS.forEach((x) => ($(x).hidden = x !== id));
 let fondateur = false;
 let lieux = null;
@@ -153,8 +153,10 @@ async function demarrer() {
   if (!m) return montrer("ecran-connexion");
   // Une invitation à cette adresse devient active à la première connexion Google ou Facebook (comme l'appli).
   await sb().rpc("activer_invitation_admin").then(() => undefined, () => undefined);
-  const { data: admin, error } = await sb().rpc("est_admin");
-  if (error || admin !== true) {
+  const { data: brut, error } = await sb().rpc("admin_statut");
+  const statut = error ? "non" : lireStatutAdmin(brut);
+  if (statut === "code_a_creer" || statut === "code_a_taper") return montrerCode(statut);
+  if (statut !== "ok") {
     $("texte-refus").textContent = m.email
       ? `Ce compte (${m.email}) ne fait pas partie de l'équipe Lokal.`
       : "Ce compte ne fait pas partie de l'équipe Lokal.";
@@ -171,6 +173,79 @@ async function demarrer() {
   for (const p of ["signalements", "messages", "retires"]) if (p !== partieActive) charger(p, { silencieux: true });
   if (fondateur && partieActive !== "alertes") charger("alertes", { silencieux: true });
 }
+
+// ---- Code Google Authenticator (la base exige une session « aal2 » pour tout ce qui est admin) ----
+let facteurNouveau = null;
+function montrerCode(statut) {
+  facteurNouveau = null;
+  const creer = statut === "code_a_creer";
+  $("titre-code").textContent = creer ? "Protège ton compte admin" : "Code Google Authenticator";
+  $("code-creer").hidden = !creer;
+  $("code-nouveau").hidden = true;
+  $("note-taper").hidden = creer;
+  $("form-code").hidden = creer;
+  $("erreur-code").hidden = true;
+  $("champ-code").value = "";
+  montrer("ecran-code");
+  (creer ? $("bouton-creer-code") : $("champ-code")).focus();
+}
+const erreurCode = (texte) => {
+  $("erreur-code").textContent = texte;
+  $("erreur-code").hidden = !texte;
+};
+$("bouton-creer-code").addEventListener("click", async (ev) => {
+  const b = ev.currentTarget;
+  b.disabled = true;
+  erreurCode("");
+  try {
+    const { data: liste } = await sb().auth.mfa.listFactors();
+    // Un essai abandonné (code jamais validé) : on le retire pour repartir proprement (comme l'appli).
+    for (const f of liste?.all ?? []) if (f.factor_type === "totp" && f.status !== "verified") await sb().auth.mfa.unenroll({ factorId: f.id });
+    const { data, error } = await sb().auth.mfa.enroll({ factorType: "totp", friendlyName: "Lokal admin", issuer: "Lokal" });
+    if (error || !data) throw error ?? new Error("Code impossible à créer");
+    facteurNouveau = data.id;
+    const qr = imageQr(data.totp.qr_code); // image fournie par Supabase (data:image/svg+xml), jamais une adresse extérieure
+    $("qr-code").hidden = !qr;
+    if (qr) $("qr-code").src = qr;
+    $("ouvrir-authenticator").href = data.totp.uri;
+    $("cle-code").textContent = data.totp.secret;
+    $("code-creer").hidden = true;
+    $("code-nouveau").hidden = false;
+    $("form-code").hidden = false;
+    $("titre-code").textContent = "Ajoute Lokal dans Google Authenticator";
+    $("titre-code").focus();
+  } catch (err) {
+    erreurCode(messageErreurCode(err));
+  } finally {
+    b.disabled = false;
+  }
+});
+$("copier-cle").addEventListener("click", () => {
+  navigator.clipboard?.writeText($("cle-code").textContent).then(() => ($("copier-cle").textContent = "Clé copiée"), () => undefined);
+});
+$("form-code").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const code = $("champ-code").value.trim();
+  if (!codeValide(code)) return erreurCode("Le code a 6 chiffres. Tu le trouves dans Google Authenticator.");
+  const bouton = ev.currentTarget.querySelector("button");
+  bouton.disabled = true;
+  erreurCode("");
+  try {
+    let id = facteurNouveau;
+    if (!id) {
+      const { data } = await sb().auth.mfa.listFactors();
+      id = data?.totp?.find((f) => f.status === "verified")?.id;
+    }
+    if (!id) throw new Error("Pas de code Google Authenticator sur ce compte");
+    const { error } = await sb().auth.mfa.challengeAndVerify({ factorId: id, code });
+    if (error) throw error;
+    await demarrer();
+  } catch (err) {
+    erreurCode(messageErreurCode(err));
+  } finally {
+    bouton.disabled = false;
+  }
+});
 
 // ---- Les parties (une à la fois, l'adresse garde la partie : #signalements, #stats…) ----
 const PARTIES_FONDATEUR = ["stats", "usage", "imports", "sans-rue", "alertes", "equipe"];
@@ -930,15 +1005,21 @@ CHARGEURS.usage = async () => {
   vider($("axe-heures"), ...a.ouverturesHeure.map((_, h) => el("span", { texte: String(h) })));
   barres($("jours"), a.ouverturesJour, (j, v) => `${JOURS_COURTS[j]} : ${fois(v)}`);
   vider($("axe-jours"), ...JOURS_COURTS.map((j) => el("span", { texte: j })));
-  const maxE = Math.max(1, ...a.ecrans.map(([, v]) => v));
+  const parts = partsEcrans(a.ecrans);
+  const maxP = Math.max(1, ...parts.map((x) => x.pct));
   vider(
     $("ecrans"),
-    ...(a.ecrans.length
-      ? a.ecrans.slice(0, 10).map(([k, v]) => {
-          const barre = el("span", { class: "mini-barre" }, el("i"));
-          barre.firstChild.style.width = `${(v / maxE) * 100}%`;
-          return el("div", { class: "ecran-ligne" }, el("span", { texte: NOMS_ECRANS[k] ?? k }), barre, el("b", { class: "nb", texte: formatNombre(v) }));
-        })
+    ...(parts.length
+      ? [
+          ...parts.slice(0, 10).map((x) => {
+            const barre = el("span", { class: "mini-barre" }, el("i"));
+            barre.firstChild.style.width = `${(x.pct / maxP) * 100}%`;
+            const ligne = el("div", { class: "ecran-ligne" }, el("span", { texte: NOMS_ECRANS[x.k] ?? x.k }), barre, el("b", { class: "nb", texte: x.texte }));
+            ligne.title = `${NOMS_ECRANS[x.k] ?? x.k} : ${x.texte} des vues (${formatNombre(x.v)})`;
+            return ligne;
+          }),
+          el("p", { class: "note", texte: "En % de toutes les vues d'écran des 4 dernières semaines." }),
+        ]
       : [el("p", { class: "note", texte: "Pas encore de données." })]),
   );
   const t = el(
