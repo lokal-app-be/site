@@ -61,7 +61,7 @@ async function lancer(message) {
   montrer("compte");
   chargerMiens();
   // Équipe Lokal : le lien vers l'Admin (la base vérifie elle-même, ce lien n'ouvre rien d'autre).
-  sb().rpc("est_admin").then(({ data }) => ($("#lien-admin").hidden = data !== true), () => undefined);
+  sb().rpc("admin_statut").then(({ data }) => ($("#lien-admin").hidden = !["ok", "code_a_creer", "code_a_taper"].includes(data)), () => undefined);
 }
 
 function ligneMien(e) {

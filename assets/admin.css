@@ -8,8 +8,19 @@
 .carte-cnx { width: min(100%, 420px); background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-carte); box-shadow: var(--ombre-carte); padding: 32px 24px; display: grid; gap: 16px; text-align: center; justify-items: center; }
 .carte-cnx img { height: 40px; width: auto; }
 .carte-cnx h1 { margin: 0; font: 900 italic 26px/1.1 var(--police); }
+.carte-cnx h1:focus { outline: none; }
 .carte-cnx .btn { width: 100%; }
 .carte-cnx a.note { color: var(--muted); }
+/* Code Google Authenticator : même carte centrée sur téléphone, tablette et ordinateur. */
+.carte-cnx > div { display: grid; gap: 12px; justify-items: center; width: 100%; }
+.carte-cnx .qr { width: 200px; height: 200px; background: #fff; border: 1.5px solid var(--line); border-radius: 14px; padding: 8px; }
+.carte-cnx .cle { display: block; width: 100%; padding: 10px; border-radius: 10px; background: var(--surface2); font: 700 15px/1.4 ui-monospace, monospace; letter-spacing: 1px; overflow-wrap: anywhere; }
+.code-champ { display: grid; gap: 8px; width: 100%; text-align: left; }
+.code-champ label { font-weight: 700; font-size: 14px; }
+.code-champ input { font: 700 24px/1 var(--police); letter-spacing: 8px; text-align: center; padding: 12px; border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--fg); }
+.code-champ input:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+#ouvrir-authenticator { display: none; }
+@media (pointer: coarse) and (max-width: 1023px) { #ouvrir-authenticator { display: inline-flex; } }
 .erreur { margin: 0; padding: 10px 14px; border-radius: var(--r-champ); background: #FDEBF2; color: #9E0B45; font: 600 14px var(--police); text-align: left; }
 .tete-admin { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 64px; padding: 0 var(--marge); background: var(--surface); border-bottom: 1.5px solid var(--line); }
 .tete-admin .g { display: flex; align-items: center; gap: 12px; min-width: 0; }

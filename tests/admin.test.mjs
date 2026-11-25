@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import {
   texteMotif, lireActivite, resumeActivite, detailAlerte, parCommune, communeDuVillage, nomSource, lirePrixTexte, versBrouillons,
   trouverLieu, titresProches, dejaSurLokal, messageScan, cadreValide, cadrePixels, tailleScan, natureTexte, texteOrigine, pluriel,
-  filtrerNonCertifies, dureeImport, emailAdminValide, formatNombre, LIGNES_STATS, partsEcrans,
+  filtrerNonCertifies, dureeImport, emailAdminValide, formatNombre, LIGNES_STATS, partsEcrans, lireStatutAdmin, codeValide, messageErreurCode, imageQr,
 } from "../assets/admin-lib.js";
 import { lireLieux } from "../assets/lokal.js";
 
@@ -125,4 +125,24 @@ test("écrans les plus vus : en % de toutes les vues", () => {
   assert.equal(partsEcrans([["carte", 3], ["fiche", 1]])[0].texte, "75 %");
   assert.deepEqual(partsEcrans([]), []);
   assert.equal(partsEcrans([["carte", 0]])[0].texte, "0 %");
+});
+
+test("code Google Authenticator : statut, format du code, messages", () => {
+  assert.equal(lireStatutAdmin("ok"), "ok");
+  assert.equal(lireStatutAdmin("code_a_taper"), "code_a_taper");
+  assert.equal(lireStatutAdmin("code_a_creer"), "code_a_creer");
+  for (const x of ["non", null, true, "admin", undefined]) assert.equal(lireStatutAdmin(x), "non");
+  assert.ok(codeValide(" 123456 "));
+  for (const x of ["12345", "1234567", "12a456", "", null]) assert.ok(!codeValide(x));
+  assert.match(messageErreurCode({ code: "mfa_verification_failed" }), /pas bon/);
+  assert.match(messageErreurCode(new Error("Failed to fetch")), /connexion/);
+  assert.match(messageErreurCode(null), /Réessaie/);
+});
+
+test("carré QR : le dessin SVG de Supabase est ré-encodé, rien d'autre n'est accepté", () => {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg"><rect fill="#000"/></svg>';
+  const attendu = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+  assert.equal(imageQr(`data:image/svg+xml;utf-8,${svg}`), attendu);
+  assert.equal(imageQr(`data:image/svg+xml;utf-8,${encodeURIComponent(svg)}`), attendu);
+  for (const x of ["https://exemple.be/qr.svg", "javascript:alert(1)", "data:text/html,<svg>", "data:image/svg+xml,hello", null]) assert.equal(imageQr(x), "");
 });

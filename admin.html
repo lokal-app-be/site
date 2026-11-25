@@ -49,6 +49,37 @@
   </div>
 </main>
 
+<!-- Code Google Authenticator de l'équipe Lokal (comme l'appli, décision d'Arnaud du 24 nov. 2026) :
+     la base ne reconnaît un admin que si la session a passé ce code. -->
+<main class="connexion-admin" id="ecran-code" hidden>
+  <div class="carte-cnx">
+    <img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal.">
+    <p class="kicker">Sécurité de l'équipe…</p>
+    <h1 id="titre-code" tabindex="-1">Code Google Authenticator</h1>
+    <div class="code-creer" id="code-creer" hidden>
+      <p class="note">Pour ouvrir l'Admin Lokal, il faut un code de Google Authenticator en plus de ta connexion. Installe d'abord l'appli gratuite Google Authenticator sur ton téléphone.</p>
+      <button class="btn" type="button" id="bouton-creer-code">Créer mon code</button>
+    </div>
+    <div class="code-nouveau" id="code-nouveau" hidden>
+      <p class="note">1. Dans Google Authenticator, touche « + », puis « Scanner un code QR », et scanne ce carré.</p>
+      <img class="qr" id="qr-code" alt="Code QR à scanner avec Google Authenticator" width="200" height="200">
+      <a class="btn sec" id="ouvrir-authenticator" href="#">Ouvrir Google Authenticator</a>
+      <p class="note">Sinon : « + », puis « Saisir une clé de configuration », et tape cette clé :</p>
+      <code class="cle" id="cle-code"></code>
+      <button class="btn sec petit" type="button" id="copier-cle">Copier la clé</button>
+      <p class="note">2. Tape ici le code à 6 chiffres affiché pour Lokal.</p>
+    </div>
+    <p class="note" id="note-taper" hidden>Ouvre Google Authenticator et tape le code à 6 chiffres affiché pour Lokal.</p>
+    <form class="code-champ" id="form-code" hidden>
+      <label for="champ-code">Code à 6 chiffres</label>
+      <input id="champ-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required>
+      <button class="btn" type="submit">Valider</button>
+    </form>
+    <p class="erreur" id="erreur-code" role="alert" hidden></p>
+    <button class="btn sec" type="button" data-deconnexion>Me déconnecter</button>
+  </div>
+</main>
+
 <p class="attente" id="ecran-attente" role="status">Un instant…</p>
 
 <div class="admin" id="ecran-admin" hidden>
