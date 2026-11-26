@@ -557,6 +557,11 @@ const erreurScan = (t) => {
   if (t) $("erreur-scan").scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 };
 const resultat = $("resultat-scan");
+// Le résultat s'affiche sous le bloc utilisé (demande d'Arnaud du 26 nov. 2026) : sous « Lire la page d'un lien »
+// pour un lien, sous les blocs photos et texte pour le reste. Même logique sur chaque écran.
+function placerResultat(apres) {
+  if (resultat.previousElementSibling !== apres) apres.after(resultat);
+}
 
 async function lirePhoto(fichier) {
   const url = URL.createObjectURL(fichier);
@@ -872,6 +877,7 @@ async function scannerPhotos(liste) {
   if (lot?.enCours) return toast("Attends la fin de la lecture en cours");
   const fichiers = [...(liste ?? [])];
   if (!fichiers.length) return;
+  placerResultat($("erreur-scan"));
   const bonnes = fichiers.filter((f) => /^image\/(jpeg|png|webp)$/.test(f.type));
   if (!bonnes.length) return erreurScan(fichiers.length > 1 ? "Choisis des photos (JPEG, PNG ou WebP)." : "Choisis une photo (JPEG, PNG ou WebP).");
   const lien = $("lien-photo").value.trim();
@@ -950,6 +956,7 @@ $("f-texte").addEventListener("submit", (e) => {
   if (lot?.enCours) return toast("Attends la fin de la lecture en cours");
   const n = natureTexte(e.target.texte.value);
   if (n.erreur) return erreurScan(n.erreur);
+  placerResultat($("erreur-scan"));
   return lireTexteOuLien(n);
 });
 $("f-lien").addEventListener("submit", (e) => {
@@ -960,6 +967,7 @@ $("f-lien").addEventListener("submit", (e) => {
   $("erreur-lien").textContent = n.erreur ?? "";
   $("erreur-lien").hidden = !n.erreur;
   if (n.erreur) return;
+  placerResultat($("f-lien"));
   return lireTexteOuLien(n);
 });
 
