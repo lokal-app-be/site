@@ -3,7 +3,7 @@ import {
   SUPABASE_URL, SUPABASE_CLE, TELLIN, CATEGORIES, COLONNES, svgIcone, depuisLigne, ecarter,
   aujourdhuiBelgique, periode, dansPeriode, pastilleDate, bientot, formatJour, texteEntree, texteQuand,
   adresseComplete, distanceKm, lireLieux, chercherLieux, libelleLieu,
-} from "./lokal.js";
+} from "./lokal.js?v=cff84955b0";
 
 const doux = !matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (s) => document.querySelector(s);

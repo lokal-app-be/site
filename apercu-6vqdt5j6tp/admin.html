@@ -17,11 +17,11 @@
 <meta property="og:description" content="Réservé à l'équipe Lokal.">
 <meta property="og:image" content="https://lokalapp.be/partage.png">
 <link rel="preload" href="/apercu-6vqdt5j6tp/assets/polices/rubik-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/apercu-6vqdt5j6tp/assets/site.css">
-<link rel="stylesheet" href="/apercu-6vqdt5j6tp/assets/admin.css">
+<link rel="stylesheet" href="/apercu-6vqdt5j6tp/assets/site.css?v=cff84955b0">
+<link rel="stylesheet" href="/apercu-6vqdt5j6tp/assets/admin.css?v=cff84955b0">
 
-<script src="/apercu-6vqdt5j6tp/assets/supabase/supabase-2.119.0.js" defer></script>
-<script type="module" src="/apercu-6vqdt5j6tp/assets/admin.js"></script>
+<script src="/apercu-6vqdt5j6tp/assets/supabase/supabase-2.119.0.js?v=cff84955b0" defer></script>
+<script type="module" src="/apercu-6vqdt5j6tp/assets/admin.js?v=cff84955b0"></script>
 </head>
 <body>
 <!-- Connexion : seulement Google ou Facebook (ils prouvent l'adresse e-mail), comme pour devenir admin dans l'appli. -->
@@ -123,7 +123,7 @@
       <section class="partie" id="p-scanner" hidden aria-labelledby="t-scan"><div class="partie-tete"><p class="kicker">L'équipe Lokal…</p><h1 id="t-scan">Ajouter un événement</h1>
         <p class="note">Comme dans l'appli : l'IA lit les infos, tu vérifies, et chaque événement est publié « non certifié ». Plafond : 300 scans par jour pour l'équipe Lokal.</p></div>
         <!-- Lire la page d'un lien (comme l'appli v24), bien visible : demande d'Arnaud du 26 nov. 2026. -->
-        <form class="bloc pad champs" id="f-lien" novalidate><label class="f"><span class="et">Lire la page d'un lien</span><input class="champ" type="url" name="lien" maxlength="300" placeholder="https://www.tellin.be/agenda/…" autocomplete="off" inputmode="url"></label><div class="actions"><button class="btn" type="submit">Lire la page de ce lien</button></div><p class="note">Agenda d'une commune, d'une salle, d'une Maison du tourisme : Claude lit la page. Pas Facebook ni Instagram (ils bloquent la lecture).</p></form>
+        <form class="bloc pad champs" id="f-lien" novalidate><label class="f"><span class="et">Lire la page d'un lien</span><input class="champ" type="url" name="lien" maxlength="300" placeholder="https://www.tellin.be/agenda/…" autocomplete="off" inputmode="url"></label><div class="actions"><button class="btn" type="submit">Lire la page de ce lien</button></div><p class="erreur" id="erreur-lien" role="alert" hidden></p><p class="note">Agenda d'une commune, d'une salle, d'une Maison du tourisme : Claude lit la page. Pas Facebook ni Instagram (ils bloquent la lecture).</p></form>
         <div class="grille2">
           <div class="bloc pad champs"><label class="depot" id="depot-scan"><input type="file" accept="image/jpeg,image/png,image/webp" id="fichier-scan" class="cache" multiple><b>Dépose une ou plusieurs photos</b><span class="note">Un panneau, une affiche, ou jusqu'à 4 affiches sur une seule photo. Jusqu'à 10 photos à la fois.</span><span class="btn sec petit">Choisir des photos</span></label><label class="f"><span class="note">Lien vers la source (facultatif)</span><input class="champ" type="url" id="lien-photo" maxlength="300" placeholder="https://…" autocomplete="off"></label><p class="note">Le lien vers la source s'affiche sur l'événement. Pour une capture d'écran, colle le lien ici avant de choisir la photo. Il vaut pour toutes les photos choisies en même temps.</p></div>
           <form class="bloc pad champs" id="f-texte" novalidate><label class="f"><span class="et">Ou colle le texte d'une annonce</span><textarea class="champ" name="texte" rows="5" maxlength="6000" placeholder="Un post Facebook, le bulletin communal…"></textarea></label><div class="actions"><button class="btn" type="submit">Lire les infos</button></div></form>

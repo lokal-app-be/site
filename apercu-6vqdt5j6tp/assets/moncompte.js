@@ -1,9 +1,9 @@
 // Page « Mon compte » (choix 1 d'Arnaud du 24 nov. 2026) : se connecter avec le même compte que l'appli,
 // voir son profil et ses événements publiés, se déconnecter, supprimer son compte (comme dans l'appli).
 // Les règles d'accès de la base (RLS) ne donnent que MES événements et MON profil.
-import { CATEGORIES, COLONNES, svgIcone, aujourdhuiBelgique, depuisLigne, pastilleDate } from "./lokal.js";
-import { sb, moi, seDeconnecter, etatMien, trierMiens } from "./compte.js";
-import { $, erreur, occupe, brancherConnexion } from "./connexion.js";
+import { CATEGORIES, COLONNES, svgIcone, aujourdhuiBelgique, depuisLigne, pastilleDate } from "./lokal.js?v=cff84955b0";
+import { sb, moi, seDeconnecter, etatMien, trierMiens } from "./compte.js?v=cff84955b0";
+import { $, erreur, occupe, brancherConnexion } from "./connexion.js?v=cff84955b0";
 
 const aujourdhui = aujourdhuiBelgique();
 const VUES = ["chargement", "connexion", "creer", "code", "oubli"];

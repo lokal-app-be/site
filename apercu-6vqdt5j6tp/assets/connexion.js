@@ -1,7 +1,7 @@
 // Connexion au compte Lokal (Google, Facebook ou e-mail, créer un compte, code, mot de passe oublié) :
 // la même partie sur « Ajouter un événement » et « Mon compte ». Les pages ont les mêmes blocs HTML
 // (#connexion, #creer, #code, #oubli) ; chacune dit comment montrer un bloc et quoi faire une fois connecté.
-import { seConnecter, connexionSociale, creerCompte, confirmerCode, renvoyerCode, envoyerCodeOubli, nouveauMotDePasse, verifierInscription, emailValide, motDePasseValide, messageErreurCompte } from "./compte.js";
+import { seConnecter, connexionSociale, creerCompte, confirmerCode, renvoyerCode, envoyerCodeOubli, nouveauMotDePasse, verifierInscription, emailValide, motDePasseValide, messageErreurCompte } from "./compte.js?v=cff84955b0";
 
 export const $ = (s, r = document) => r.querySelector(s);
 export const SANS_PSEUDO = "Compte créé. Ce pseudo n'a pas pu être gardé (déjà pris ou pas autorisé) : choisis-en un autre dans l'appli, Modifier mon profil.";
