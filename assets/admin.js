@@ -550,9 +550,11 @@ function noterRetrait(r) {
 // chaque photo a sa propre case de résultat, vérifiée et publiée séparément. Pas de « Tout publier ».
 const MAX_PHOTOS = 10;
 let lot = null; // { groupes: [{ nom, etat, message, prets, mauvaise, source, publies, noeud }], enCours }
+// Le message reste visible : la page défile jusqu'à lui (sinon il peut être caché sous les blocs, bug du 26 nov.).
 const erreurScan = (t) => {
   $("erreur-scan").textContent = t;
   $("erreur-scan").hidden = !t;
+  if (t) $("erreur-scan").scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 };
 const resultat = $("resultat-scan");
 

@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DOSSIER, construire, pagesApercu, transformerPage, transformerScript } from "../outils/apercu.mjs";
+import { DOSSIER, construire, pagesApercu, transformerPage, transformerScript, versionFichiers } from "../outils/apercu.mjs";
 
 test("le nom du dossier est impossible à deviner", () => {
   assert.match(DOSSIER, /^apercu-[a-z0-9]{10}$/);
@@ -51,4 +51,17 @@ test("le dossier construit : toutes les pages, aucun chemin hors du dossier, jam
   } finally {
     rmSync(sortie, { recursive: true, force: true });
   }
+});
+
+test("après une mise à jour, le navigateur charge les nouveaux scripts (version dans l'adresse)", () => {
+  const html = '<meta charset="utf-8"><script type="module" src="/assets/admin.js"></script><link rel="stylesheet" href="/assets/site.css"><img src="/assets/images/lokal.png">';
+  const s = transformerPage(html, "/apercu-x", "abc123");
+  assert.ok(s.includes('src="/apercu-x/assets/admin.js?v=abc123"'));
+  assert.ok(s.includes('href="/apercu-x/assets/site.css?v=abc123"'));
+  assert.ok(s.includes('src="/apercu-x/assets/images/lokal.png"'));
+  const js = transformerScript('import { a } from "./admin-lib.js";\nimport {b} from \'./lokal.js\';\nsb().from("evenements");', "/apercu-x", "abc123");
+  assert.ok(js.includes('from "./admin-lib.js?v=abc123"'));
+  assert.ok(js.includes("from './lokal.js?v=abc123'"));
+  assert.ok(js.includes('from("evenements")'));
+  assert.match(versionFichiers(), /^[0-9a-f]{10}$/);
 });
