@@ -1,6 +1,6 @@
 // « Ajouter un événement » sur le site : les mêmes règles que le formulaire de l'appli (src/app/evenement/formulaire.tsx).
 // Fonctions sans écran, testées automatiquement (tests/formulaire.test.mjs).
-import { ajouterJours, isoLocal, chercherLieux, distanceKm } from "./lokal.js?v=cff84955b0";
+import { ajouterJours, isoLocal, chercherLieux, distanceKm } from "./lokal.js?v=06877d421e";
 
 // Les règles du prototype, dans le même ordre. Renvoie le message et le champ fautif.
 export function verifier(s) {
