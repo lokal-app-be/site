@@ -1,7 +1,7 @@
 // Connexion au compte Lokal sur le site : le même compte que dans l'appli (Supabase, serveurs à Francfort).
 // La clé est la clé « publishable » de l'appli : publique par nature, ce sont les règles d'accès (RLS) qui protègent.
 // La session est gardée dans ce navigateur (stockage local), comme « rester connecté » dans l'appli.
-import { SUPABASE_URL, SUPABASE_CLE } from "./lokal.js?v=cff84955b0";
+import { SUPABASE_URL, SUPABASE_CLE } from "./lokal.js?v=06877d421e";
 
 let client = null;
 export function sb() {

@@ -1,5 +1,5 @@
 // Commun à toutes les pages de lokalapp.be : les vraies icônes de l'appli dans les visuels, et « Remonter en haut ».
-import { CATEGORIES, svgIcone, SUPABASE_URL } from "./lokal.js?v=cff84955b0";
+import { CATEGORIES, svgIcone, SUPABASE_URL } from "./lokal.js?v=06877d421e";
 
 document.querySelectorAll("[data-icone]").forEach((n) => {
   const cat = n.getAttribute("data-icone");

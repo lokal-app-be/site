@@ -1,10 +1,10 @@
 // Page « Ajouter un événement » : connexion au compte Lokal, puis le formulaire (mêmes règles que l'appli).
-import { CATEGORIES, svgIcone, aujourdhuiBelgique, ajouterJours, pastilleDate, lireLieux, chercherLieux, libelleLieu } from "./lokal.js?v=cff84955b0";
-import { sb, moi, seDeconnecter } from "./compte.js?v=cff84955b0";
-import { $, erreur, occupe, brancherConnexion } from "./connexion.js?v=cff84955b0";
+import { CATEGORIES, svgIcone, aujourdhuiBelgique, ajouterJours, pastilleDate, lireLieux, chercherLieux, libelleLieu } from "./lokal.js?v=06877d421e";
+import { sb, moi, seDeconnecter } from "./compte.js?v=06877d421e";
+import { $, erreur, occupe, brancherConnexion } from "./connexion.js?v=06877d421e";
 import {
   verifier, datesSerie, nouvelleSerie, positionDepuisAdresse, versLigne, lirePrix, messageErreur, REPETITIONS, DUREE_SERIE_JOURS, tailleReduite,
-} from "./formulaire.js?v=cff84955b0";
+} from "./formulaire.js?v=06877d421e";
 
 const aujourdhui = aujourdhuiBelgique();
 const VUES = ["chargement", "connexion", "creer", "code", "oubli", "formulaire", "publie"];
