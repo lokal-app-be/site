@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
 <title>Confidentialité · Lokal</title>
 <meta name="description" content="Quelles données Lokal utilise, pourquoi, chez qui elles sont stockées et comment supprimer ton compte et tes données.">
 <link rel="canonical" href="https://lokalapp.be/confidentialite">
@@ -15,24 +16,27 @@
 <meta property="og:title" content="Confidentialité · Lokal">
 <meta property="og:description" content="Quelles données Lokal utilise, pourquoi, chez qui elles sont stockées et comment supprimer ton compte et tes données.">
 <meta property="og:image" content="https://lokalapp.be/partage.png">
-<style>
-  :root { --bg: #FFFFFF; --fg: #111111; --muted: #5B6170; --accent: #D10F5C; }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 680px; margin: 0 auto; padding: 32px 16px 48px; }
-  .logo { font-weight: 900; font-style: italic; font-size: 34px; letter-spacing: -1px; text-decoration: none; color: var(--fg); }
-  .logo span { color: var(--accent); }
-  h1 { font-size: 28px; line-height: 1.2; }
-  h2 { font-size: 20px; margin-top: 32px; }
-  .note { color: var(--muted); font-size: 15px; }
-  a { color: inherit; }
-  a:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
-</style>
+<link rel="preload" href="/assets/polices/rubik-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<script type="module" src="/assets/page.js"></script>
 </head>
 <body>
-<main>
-<a class="logo" href="/">Lokal<span>.</span></a>
+
+<header class="tete cadre">
+  <a class="marque" href="/" aria-label="Lokal, accueil"><img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal."></a>
+  <nav class="nav" aria-label="Menu">
+    <a class="lien" href="/#carte">La carte</a>
+    <a class="lien" href="/organisateurs">Organisateurs</a>
+    <a class="lien" href="/communes">Communes et salles</a>
+    <span class="bientot petit">Bientôt sur Android et iPhone</span>
+    <a class="btn sec petit lien-compte" href="/compte" id="lien-compte">Se connecter</a>
+  </nav>
+</header>
+
+<main class="texte-page cadre">
+<article class="feuille">
 <h1>Politique de confidentialité</h1>
-<p class="note">Dernière mise à jour : 16 novembre 2026</p>
+<p class="note">Dernière mise à jour : 23 novembre 2026</p>
 <p>En bref : Lokal ne garde que ce qui sert à faire marcher l'appli. Pas de publicité, pas de profil publicitaire, pas de revente de données. Tu peux effacer ton compte à tout moment dans l'appli.</p>
 
 <h2>Sans compte</h2>
@@ -55,6 +59,8 @@
 </ul>
 <p>Tu peux retirer l'accès à tout moment dans les réglages de ton téléphone. La position des événements, elle, vient seulement de leur adresse.</p>
 
+<h2>Sur le site lokalapp.be</h2>
+<p>Tu peux aussi utiliser ton compte Lokal sur le site (le même que dans l'appli), par exemple pour ajouter un événement. Pour que tu restes connecté, le site garde une clé de connexion dans ton navigateur. Ce n'est pas un cookie, et elle ne sert qu'à ça. Elle s'efface quand tu te déconnectes. Le site ne garde rien d'autre sur toi.</p>
 <h2>Ce qui reste sur ton téléphone</h2>
 <p>Le compteur de verres et tes préférences restent sur ton téléphone. Nous ne les recevons pas.</p>
 
@@ -77,8 +83,8 @@
   <li>Anthropic : lecture des affiches scannées (États-Unis).</li>
   <li>Expo et Google Firebase : envoi des notifications et mises à jour de l'appli (États-Unis).</li>
   <li>Resend : e-mails de compte (inscription, mot de passe oublié).</li>
-  <li>OpenStreetMap (Nominatim) : trouver la position d'une adresse d'événement.</li>
-  <li>OpenFreeMap : fond de carte (reçoit l'adresse internet de ton téléphone, comme tout site).</li>
+  <li>OpenStreetMap (Nominatim) : trouver la position d'une adresse d'événement (quand tu publies depuis le site, la recherche part de ton navigateur).</li>
+  <li>OpenFreeMap : fond de carte (reçoit l'adresse internet de ton téléphone ou de ton ordinateur, comme tout site).</li>
   <li>GitHub Pages : hébergement du site lokalapp.be (États-Unis).</li>
 </ul>
 <p>Pour les entreprises situées hors de l'Union européenne, le transfert est encadré par les garanties prévues par le RGPD (clauses contractuelles types de la Commission européenne ou cadre de protection des données UE–États-Unis).</p>
@@ -90,14 +96,28 @@
 <p>Lokal est ouvert dès 13 ans. En Belgique, on peut accepter seul ces règles à partir de 13 ans. Si tu as moins de 13 ans, n'utilise pas Lokal.</p>
 
 <h2>Cookies</h2>
-<p>Le site lokalapp.be n'utilise aucun cookie ni outil de mesure d'audience. L'appli n'utilise aucun traceur publicitaire.</p>
+<p>Le site lokalapp.be n'utilise aucun cookie ni outil de mesure d'audience. Si tu te connectes sur le site, il garde seulement ta clé de connexion (voir « Sur le site lokalapp.be »). L'appli n'utilise aucun traceur publicitaire.</p>
 
 <h2>Tes droits</h2>
 <p>Tu peux demander à voir, corriger, recevoir ou effacer tes données, ou t'opposer à un usage, en écrivant à <a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a>. Nous répondons dans le mois.</p>
 <p>Si tu n'es pas satisfait, tu peux porter plainte auprès de l'Autorité de protection des données : rue de la Presse 35, 1000 Bruxelles, <a href="https://www.autoriteprotectiondonnees.be">autoriteprotectiondonnees.be</a>.</p>
 
 <p class="note">Responsable des données : Arnaud Gérome (Belgique). Pour toute question : <a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a></p>
-<p class="note"><a href="/mentions-legales">Mentions légales</a> · <a href="/confidentialite">Confidentialité</a> · <a href="/conditions">Conditions d'utilisation</a></p>
+</article>
 </main>
+
+<footer class="pied cadre">
+  <div class="pied-grille">
+    <div class="pied-marque">
+      <img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal.">
+      <p>Ton agenda Lokal dans ta poche. Toutes les sorties autour de toi, en Belgique.</p>
+    </div>
+    <div><h2>L'appli</h2><ul><li><span>Bientôt sur Android et iPhone</span></li><li><a href="/#carte">La carte</a></li></ul></div>
+    <div><h2>Organisateurs</h2><ul><li><a href="/ajouter">Ajouter un événement</a></li><li><a href="/organisateurs">Comment ça marche</a></li><li><a href="/communes">Communes et salles</a></li><li><a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a></li></ul></div>
+    <div><h2>Infos</h2><ul><li><a href="/mentions-legales">Mentions légales</a></li><li><a href="/confidentialite">Confidentialité</a></li><li><a href="/conditions">Conditions d'utilisation</a></li><li><a href="/supprimer-compte">Supprimer mon compte</a></li></ul></div>
+  </div>
+  <div class="bas"><span>© 2026 Lokal · Carte © contributeurs OpenStreetMap</span><button class="haut" id="haut" type="button"><span class="rond petit" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></span>Remonter en haut</button></div>
+</footer>
+
 </body>
 </html>

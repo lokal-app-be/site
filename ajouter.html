@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://ggubfbpiqmbzakyywezf.supabase.co; connect-src 'self' https://ggubfbpiqmbzakyywezf.supabase.co https://nominatim.openstreetmap.org; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="robots" content="noindex">
+<title>Ajouter un événement · Lokal</title>
+<meta name="description" content="Publie ton événement sur Lokal depuis le site, avec ton compte Lokal : il apparaît tout de suite sur la carte.">
+<link rel="canonical" href="https://lokalapp.be/ajouter">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lokal">
+<meta property="og:locale" content="fr_BE">
+<meta property="og:url" content="https://lokalapp.be/ajouter">
+<meta property="og:title" content="Ajouter un événement · Lokal">
+<meta property="og:description" content="Publie ton événement sur Lokal depuis le site, avec ton compte Lokal : il apparaît tout de suite sur la carte.">
+<meta property="og:image" content="https://lokalapp.be/partage.png">
+<link rel="preload" href="/assets/polices/rubik-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/pages.css">
+<link rel="stylesheet" href="/assets/ajouter.css">
+<script src="/assets/supabase/supabase-2.119.0.js" defer></script>
+<script type="module" src="/assets/page.js"></script>
+<script type="module" src="/assets/ajouter.js"></script>
+</head>
+<body>
+
+<header class="tete cadre">
+  <a class="marque" href="/" aria-label="Lokal, accueil"><img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal."></a>
+  <nav class="nav" aria-label="Menu">
+    <a class="lien" href="/#carte">La carte</a>
+    <a class="lien" href="/organisateurs">Organisateurs</a>
+    <a class="lien" href="/communes">Communes et salles</a>
+    <span class="bientot petit">Bientôt sur Android et iPhone</span>
+    <a class="btn sec petit lien-compte" href="/compte" id="lien-compte">Se connecter</a>
+  </nav>
+</header>
+
+<main class="page cadre">
+<div class="page-tete">
+  <p class="kicker">C'est toi qui organises ?</p>
+  <h1>Ajouter un événement</h1>
+  <p class="intro">Les mêmes cases que dans l'appli. Ton événement apparaît tout de suite sur la carte et dans l'appli.</p>
+</div>
+<div class="ajout-grille" id="ajout">
+  <p class="bloc chargement" id="chargement" role="status">Un instant…</p>
+
+  <!-- 1. Connexion (le même compte que dans l'appli) -->
+  <section class="bloc carte-compte" id="connexion" hidden aria-labelledby="t-cnx">
+    <h2 class="cs-titre" id="t-cnx">Connecte-toi d'abord</h2>
+    <p class="intro">Avec ton compte Lokal, le même que dans l'appli.</p>
+    <div class="cs-boutons"><button class="btn" type="button" data-fournisseur="google">Continuer avec Google</button><button class="btn sec" type="button" data-fournisseur="facebook">Continuer avec Facebook</button></div>
+    <p class="ou"><span>ou avec ton e-mail</span></p>
+    <form class="champs" id="f-cnx" novalidate>
+      <label class="f"><span>E-mail</span><input class="champ" name="email" type="email" autocomplete="email" maxlength="80" required></label>
+      <label class="f"><span>Mot de passe</span><input class="champ" name="mdp" type="password" autocomplete="current-password" maxlength="72" required></label>
+      <p class="erreur" role="alert" hidden></p>
+      <div class="f-bas"><button class="btn" type="submit">Me connecter</button><button class="lien-btn" type="button" data-vers="oubli">Mot de passe oublié ?</button></div>
+    </form>
+    <p class="note-f">Pas encore de compte ? <button class="lien-btn" type="button" data-vers="creer">Crée-le ici en une minute</button></p>
+  </section>
+
+  <!-- 2. Créer un compte -->
+  <section class="bloc carte-compte" id="creer" hidden aria-labelledby="t-creer">
+    <h2 class="cs-titre" id="t-creer">Crée ton compte</h2>
+    <form class="champs" id="f-creer" novalidate>
+      <div class="f-ligne"><label class="f"><span>Prénom</span><input class="champ" name="prenom" maxlength="24" autocomplete="given-name"></label><label class="f"><span>Nom</span><input class="champ" name="nom" maxlength="30" autocomplete="family-name"></label></div>
+      <p class="note-f">Ton prénom et ton nom restent privés. Les autres voient ton pseudo, ou ton prénom et l'initiale de ton nom.</p>
+      <label class="f"><span>Pseudo (facultatif)</span><input class="champ" name="pseudo" maxlength="24" autocomplete="off" placeholder="ex. : lulu_bure"></label>
+      <label class="f"><span>E-mail</span><input class="champ" name="email" type="email" maxlength="80" autocomplete="email" placeholder="toi@exemple.be"></label>
+      <label class="f"><span>Mot de passe</span><input class="champ" name="mdp" type="password" maxlength="72" autocomplete="new-password" placeholder="8 caractères minimum"></label>
+      <p class="note-f">Lokal est ouvert dès 13 ans. En créant ton compte, tu acceptes les <a href="/conditions" target="_blank" rel="noopener">conditions d'utilisation</a> et la <a href="/confidentialite" target="_blank" rel="noopener">politique de confidentialité</a>.</p>
+      <p class="erreur" role="alert" hidden></p>
+      <div class="f-bas"><button class="btn" type="submit">Créer mon compte</button><button class="lien-btn" type="button" data-vers="connexion">J'ai déjà un compte</button></div>
+    </form>
+  </section>
+
+  <!-- 3. Code reçu par e-mail -->
+  <section class="bloc carte-compte" id="code" hidden aria-labelledby="t-code">
+    <h2 class="cs-titre" id="t-code">Confirme ton e-mail</h2>
+    <p class="intro">On t'a envoyé un code à 6 chiffres. Regarde aussi dans les indésirables.</p>
+    <form class="champs" id="f-code" novalidate>
+      <label class="f"><span>Code reçu par e-mail</span><input class="champ code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
+      <p class="erreur" role="alert" hidden></p>
+      <div class="f-bas"><button class="btn" type="submit">Confirmer</button><button class="lien-btn" type="button" id="renvoyer">Renvoyer un code</button><button class="lien-btn" type="button" data-vers="creer">Changer d'e-mail</button></div>
+    </form>
+  </section>
+
+  <!-- 4. Mot de passe oublié -->
+  <section class="bloc carte-compte" id="oubli" hidden aria-labelledby="t-oubli">
+    <h2 class="cs-titre" id="t-oubli">Mot de passe oublié</h2>
+    <form class="champs" id="f-oubli" novalidate>
+      <label class="f"><span>E-mail de ton compte</span><input class="champ" name="email" type="email" maxlength="80" autocomplete="email"></label>
+      <div class="oubli-suite" hidden>
+        <label class="f"><span>Code reçu par e-mail</span><input class="champ code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6"></label>
+        <label class="f"><span>Nouveau mot de passe</span><input class="champ" name="mdp" type="password" maxlength="72" autocomplete="new-password" placeholder="8 caractères minimum"></label>
+      </div>
+      <p class="erreur" role="alert" hidden></p>
+      <div class="f-bas"><button class="btn" type="submit">Recevoir un code</button><button class="lien-btn" type="button" data-vers="connexion">Retour</button></div>
+    </form>
+  </section>
+
+  <!-- 5. Le formulaire -->
+  <form class="bloc formulaire" id="formulaire" hidden novalidate aria-label="Ton événement">
+    <div class="connecte"><span>Connecté · <b id="mon-nom"></b></span><button class="lien-btn" type="button" id="deconnexion">Me déconnecter</button></div>
+    <label class="f" id="ligne-profil" hidden><span>Publier en tant que</span><select class="champ" name="createur" id="createur"></select></label>
+    <label class="f"><span>Titre</span><input class="champ" name="titre" maxlength="60" placeholder="Ex. : Souper aux boulettes du club"></label>
+    <div class="f" data-champ="categorie"><span>Type de sortie</span><div class="types" role="group" aria-label="Type de sortie"><button type="button" class="type-btn" data-cat="culture" aria-pressed="false"><span class="ico petit" data-icone="culture"></span>Culture</button><button type="button" class="type-btn" data-cat="fete" aria-pressed="false"><span class="ico petit" data-icone="fete"></span>Fête</button><button type="button" class="type-btn" data-cat="jeux" aria-pressed="false"><span class="ico petit" data-icone="jeux"></span>Jeux</button><button type="button" class="type-btn" data-cat="sport" aria-pressed="false"><span class="ico petit" data-icone="sport"></span>Sport</button><button type="button" class="type-btn" data-cat="autre" aria-pressed="false"><span class="ico petit" data-icone="autre"></span>Autre</button></div></div>
+    <div class="f-ligne"><label class="f"><span>Date</span><input class="champ" name="date" type="date"></label><label class="f"><span>Heure de début</span><input class="champ" name="heure" type="time" value="20:00"></label></div>
+    <div class="f village-f"><label class="f" for="village"><span>Village ou ville</span></label>
+      <input class="champ" id="village" name="village" autocomplete="off" maxlength="60" placeholder="Tellin" role="combobox" aria-expanded="false" aria-controls="villages" aria-autocomplete="list">
+      <ul class="villages" id="villages" role="listbox" hidden></ul></div>
+    <label class="f"><span>Lieu (facultatif)</span><input class="champ" name="lieu" maxlength="50" placeholder="Ex. : Salle du village"></label>
+    <div class="f-ligne adresse"><label class="f"><span>Rue (facultatif)</span><input class="champ" name="rue" maxlength="60" autocomplete="address-line1" placeholder="Rue de la Station"></label><label class="f"><span>Numéro</span><input class="champ" name="numero" maxlength="8" placeholder="12"></label><label class="f"><span>Code postal</span><input class="champ" name="codePostal" maxlength="4" inputmode="numeric" placeholder="6927"></label></div>
+    <label class="case" id="case-cacher"><input type="checkbox" name="cacher"><span><b>Cacher l'adresse</b><small>Par défaut, tout le monde la voit. Si tu la caches, les autres voient seulement le village, et tu acceptes toi-même qui la reçoit.</small></span></label>
+
+    <details class="plus" id="plus">
+      <summary>Plus de détails</summary>
+      <div class="plus-corps">
+        <div class="f-ligne"><label class="f"><span>Heure de fin</span><input class="champ" name="heureFin" type="time"></label><label class="f"><span>Date de fin (plusieurs jours)</span><input class="champ" name="dateFin" type="date"></label></div>
+        <div class="f-ligne"><label class="f"><span>Répéter</span><select class="champ" name="repeter" id="repeter"></select></label><label class="f" id="ligne-jusqua" hidden><span>Jusqu'au</span><input class="champ" name="jusqua" type="date"></label></div>
+        <p class="note-f" id="note-serie" hidden></p>
+        <label class="case"><input type="checkbox" name="payant"><span><b>Entrée payante</b><small>Sinon, l'événement est affiché comme gratuit.</small></span></label>
+        <div class="prix" id="prix" hidden data-champ="prix"></div>
+        <button class="lien-btn" type="button" id="ajouter-prix" hidden>+ Ajouter un autre prix (ex. : enfants, prévente)</button>
+        <div class="f"><span>Affiche (facultatif)</span>
+          <label class="depot" id="depot"><input type="file" accept="image/jpeg,image/png,image/webp" id="fichier" class="cache"><b>Dépose ton affiche ici</b><small>ou</small><span class="btn sec">Choisir une image</span></label>
+          <div class="apercu-affiche" id="apercu-affiche" hidden><img alt="Ton affiche"><button class="lien-btn" type="button" id="retirer-affiche">Retirer l'affiche</button></div>
+        </div>
+        <label class="f"><span>Description</span><textarea class="champ" name="description" rows="4" maxlength="2000" placeholder="Ce qui t'attend, ce qu'il faut apporter…"></textarea></label>
+        <label class="case" id="case-groupe"><input type="checkbox" name="groupe"><span><b>Je cherche des personnes pour compléter un groupe</b><small id="detail-groupe">Ex. : il manque 2 joueurs pour le quiz. Chacun rejoint le groupe en un geste.</small></span></label>
+        <div class="f-ligne" id="ligne-groupe" hidden><label class="f"><span>Taille du groupe</span><input class="champ" name="taille" type="number" min="2" max="30" value="4"></label><label class="f"><span>Déjà présents</span><input class="champ" name="deja" type="number" min="1" max="29" value="2"></label></div>
+        <label class="case"><input type="checkbox" name="prive"><span><b>🔒 Événement privé</b><small>Seuls les amis que tu invites le voient (pas sur la carte des autres). Ça ne se change plus après. Tu invites tes amis depuis l'appli.</small></span></label>
+      </div>
+    </details>
+
+    <p class="erreur" role="alert" hidden></p>
+    <div class="f-bas"><button class="btn" type="submit" id="publier">Publier</button><span class="note-f">En publiant, tu confirmes que les infos sont justes.</span></div>
+  </form>
+
+  <!-- 6. Publié -->
+  <section class="bloc carte-compte" id="publie" hidden aria-labelledby="t-pub" tabindex="-1">
+    <p class="kicker">C'est publié !</p>
+    <h2 class="cs-titre" id="t-pub"></h2>
+    <p class="intro" id="pub-detail"></p>
+    <div class="f-bas"><a class="btn" href="/#carte">Voir la carte</a><button class="btn sec" type="button" id="encore">Ajouter un autre événement</button></div>
+  </section>
+
+  <aside class="bloc apercu-ev" id="apercu" hidden aria-label="Aperçu">
+    <h2 class="cs-titre">Aperçu sur la carte</h2>
+    <div class="evc"><span class="ico" id="ap-ico" data-icone="autre"></span><div class="evc-t"><div class="pills"><span class="pdate" id="ap-date"></span><span class="certif">✓ Certifié</span></div><b id="ap-titre">Ton titre ici</b><small id="ap-lieu">Ton village</small></div></div>
+    <p class="note-f">C'est la carte que les gens verront sur le site et dans l'appli.</p>
+  </aside>
+</div>
+</main>
+
+<footer class="pied cadre">
+  <div class="pied-grille">
+    <div class="pied-marque">
+      <img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal.">
+      <p>Ton agenda Lokal dans ta poche. Toutes les sorties autour de toi, en Belgique.</p>
+    </div>
+    <div><h2>L'appli</h2><ul><li><span>Bientôt sur Android et iPhone</span></li><li><a href="/#carte">La carte</a></li></ul></div>
+    <div><h2>Organisateurs</h2><ul><li><a href="/ajouter">Ajouter un événement</a></li><li><a href="/organisateurs">Comment ça marche</a></li><li><a href="/communes">Communes et salles</a></li><li><a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a></li></ul></div>
+    <div><h2>Infos</h2><ul><li><a href="/mentions-legales">Mentions légales</a></li><li><a href="/confidentialite">Confidentialité</a></li><li><a href="/conditions">Conditions d'utilisation</a></li><li><a href="/supprimer-compte">Supprimer mon compte</a></li></ul></div>
+  </div>
+  <div class="bas"><span>© 2026 Lokal · Carte © contributeurs OpenStreetMap</span><button class="haut" id="haut" type="button"><span class="rond petit" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></span>Remonter en haut</button></div>
+</footer>
+
+</body>
+</html>

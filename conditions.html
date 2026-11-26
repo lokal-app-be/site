@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
 <title>Conditions d'utilisation · Lokal</title>
 <meta name="description" content="Les règles pour utiliser Lokal, publier un événement et signaler un contenu. Lokal montre sur une carte les sorties autour de toi en Belgique.">
 <link rel="canonical" href="https://lokalapp.be/conditions">
@@ -15,22 +16,25 @@
 <meta property="og:title" content="Conditions d'utilisation · Lokal">
 <meta property="og:description" content="Les règles pour utiliser Lokal, publier un événement et signaler un contenu. Lokal montre sur une carte les sorties autour de toi en Belgique.">
 <meta property="og:image" content="https://lokalapp.be/partage.png">
-<style>
-  :root { --bg: #FFFFFF; --fg: #111111; --muted: #5B6170; --accent: #D10F5C; }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 680px; margin: 0 auto; padding: 32px 16px 48px; }
-  .logo { font-weight: 900; font-style: italic; font-size: 34px; letter-spacing: -1px; text-decoration: none; color: var(--fg); }
-  .logo span { color: var(--accent); }
-  h1 { font-size: 28px; line-height: 1.2; }
-  h2 { font-size: 20px; margin-top: 32px; }
-  .note { color: var(--muted); font-size: 15px; }
-  a { color: inherit; }
-  a:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
-</style>
+<link rel="preload" href="/assets/polices/rubik-latin-900-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<script type="module" src="/assets/page.js"></script>
 </head>
 <body>
-<main>
-<a class="logo" href="/">Lokal<span>.</span></a>
+
+<header class="tete cadre">
+  <a class="marque" href="/" aria-label="Lokal, accueil"><img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal."></a>
+  <nav class="nav" aria-label="Menu">
+    <a class="lien" href="/#carte">La carte</a>
+    <a class="lien" href="/organisateurs">Organisateurs</a>
+    <a class="lien" href="/communes">Communes et salles</a>
+    <span class="bientot petit">Bientôt sur Android et iPhone</span>
+    <a class="btn sec petit lien-compte" href="/compte" id="lien-compte">Se connecter</a>
+  </nav>
+</header>
+
+<main class="texte-page cadre">
+<article class="feuille">
 <h1>Conditions d'utilisation</h1>
 <p class="note">Dernière mise à jour : 16 novembre 2026</p>
 <p>En créant un compte sur Lokal, tu acceptes ces règles. Elles sont courtes, lis-les.</p>
@@ -66,8 +70,21 @@
 
 <h2>9. Changements</h2>
 <p>Si ces règles changent, la date en haut de cette page change. Contact : <a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a>. Ces règles suivent le droit belge.</p>
-
-<p class="note"><a href="/mentions-legales">Mentions légales</a> · <a href="/confidentialite">Confidentialité</a> · <a href="/conditions">Conditions d'utilisation</a></p>
+</article>
 </main>
+
+<footer class="pied cadre">
+  <div class="pied-grille">
+    <div class="pied-marque">
+      <img src="/assets/images/lokal.png" width="360" height="114" alt="Lokal.">
+      <p>Ton agenda Lokal dans ta poche. Toutes les sorties autour de toi, en Belgique.</p>
+    </div>
+    <div><h2>L'appli</h2><ul><li><span>Bientôt sur Android et iPhone</span></li><li><a href="/#carte">La carte</a></li></ul></div>
+    <div><h2>Organisateurs</h2><ul><li><a href="/ajouter">Ajouter un événement</a></li><li><a href="/organisateurs">Comment ça marche</a></li><li><a href="/communes">Communes et salles</a></li><li><a href="mailto:contact@lokalapp.be">contact@lokalapp.be</a></li></ul></div>
+    <div><h2>Infos</h2><ul><li><a href="/mentions-legales">Mentions légales</a></li><li><a href="/confidentialite">Confidentialité</a></li><li><a href="/conditions">Conditions d'utilisation</a></li><li><a href="/supprimer-compte">Supprimer mon compte</a></li></ul></div>
+  </div>
+  <div class="bas"><span>© 2026 Lokal · Carte © contributeurs OpenStreetMap</span><button class="haut" id="haut" type="button"><span class="rond petit" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg></span>Remonter en haut</button></div>
+</footer>
+
 </body>
 </html>

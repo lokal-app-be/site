@@ -1,0 +1,51 @@
+/* Page « Mon compte ». Même logique sur chaque écran : téléphone et tablette, une colonne
+   (profil, mes événements, supprimer) ; ordinateur, mes événements à gauche, profil et suppression à droite. */
+.compte-grille { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; max-width: var(--large); margin: 0 auto; align-items: start; }
+.compte-grille .carte-compte { max-width: 640px; justify-self: center; }
+@media (min-width: 1100px) {
+  .compte-grille { grid-template-columns: minmax(0, 1fr) 380px; grid-template-areas: "miens profil" "miens supprimer" "miens ."; }
+  .compte-grille .carte-compte { max-width: none; justify-self: stretch; }
+  .compte-grille > .chargement, .compte-grille > #connexion, .compte-grille > #creer, .compte-grille > #code, .compte-grille > #oubli { grid-column: 1 / -1; max-width: 640px; justify-self: center; width: 100%; }
+  .profil-compte { grid-area: profil; }
+  .miens { grid-area: miens; }
+  .danger-compte { grid-area: supprimer; }
+}
+
+.infos-compte { display: grid; gap: 10px; margin: 0; }
+.infos-compte .rang { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 8px; font-size: 15px; }
+.infos-compte dt { color: var(--muted); font-weight: 600; }
+.infos-compte dd { margin: 0; font-weight: 700; overflow-wrap: anywhere; }
+
+.liste-miens { display: grid; gap: 12px; }
+/* Mes événements et Scannés par toi : listes repliées au départ, le titre et le nombre restent visibles.
+   Même chose sur chaque écran (téléphone, tablette, ordinateur). */
+.miens { gap: 0; }
+.depliant + .depliant { margin-top: 8px; padding-top: 8px; border-top: 1.5px solid var(--line); }
+.depliant summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 10px; min-height: 48px; }
+.depliant summary::-webkit-details-marker { display: none; }
+.depliant summary::after { content: ""; flex: none; margin: 0 6px 4px auto; width: 10px; height: 10px; border-right: 2.5px solid var(--fg); border-bottom: 2.5px solid var(--fg); transform: rotate(45deg); transition: transform .2s; }
+.depliant[open] summary::after { margin-bottom: -4px; transform: rotate(-135deg); }
+.depliant summary:focus-visible { outline: 2px solid var(--rose); outline-offset: 4px; border-radius: 8px; }
+.depliant .nombre { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 8px; border-radius: var(--rond); background: var(--surface2); font: 700 13px/1 var(--police); }
+.depliant .liste-miens { margin: 8px 0 12px; }
+.miens > div:last-child { margin-top: 12px; }
+@media (prefers-reduced-motion: reduce) { .depliant summary::after { transition: none; } }
+.mien { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: start; padding: 12px; border: 1.5px solid var(--line); border-radius: var(--r-carte); background: var(--surface); }
+.mien.passe { opacity: .7; }
+.mien .ico { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }
+.mien .ico svg { width: 24px; height: 24px; }
+.mien-corps { display: grid; gap: 4px; min-width: 0; }
+.mien-corps .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.mien-corps b { font: 900 italic 17px/1.2 var(--police); overflow-wrap: anywhere; }
+.mien-corps small { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.mien-corps a { justify-self: start; color: var(--rose); font: 700 14px var(--police); text-decoration: none; padding: 4px 0; }
+.mien-corps a:hover { text-decoration: underline; }
+.etat { display: inline-flex; align-items: center; height: 22px; padding: 0 10px; border-radius: var(--rond); background: var(--surface2); color: var(--fg); font: 700 11px/1 var(--police); white-space: nowrap; }
+.etat.alerte { background: #FDECEC; color: #C62828; }
+.vide { margin: 0; color: var(--muted); }
+
+.btn.danger { background: var(--surface); color: #C62828; border: 1.5px solid #C62828; box-shadow: none; font: 700 15px/1 var(--police); }
+.btn.danger:hover { background: #FDECEC; transform: none; }
+.fenetre-compte { max-width: min(440px, calc(100% - 32px)); padding: 24px; border: 0; display: grid; gap: 14px; }
+.fenetre-compte:not([open]) { display: none; }
+.fenetre-compte::backdrop { background: rgba(17, 17, 17, .45); }
