@@ -101,8 +101,9 @@ export async function connexionSociale(fournisseur) {
   if (r.error) throw r.error;
 }
 
+// Se déconnecter du site seulement : l'appli sur le téléphone reste connectée (et n'a pas à redemander le code admin).
 export async function seDeconnecter() {
-  await sb().auth.signOut();
+  await sb().auth.signOut({ scope: "local" });
 }
 
 // Créer un compte : le code à 6 chiffres arrive par e-mail (comme dans l'appli).
