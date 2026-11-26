@@ -220,7 +220,12 @@ export function texteQuand(e, aujourdhui = aujourdhuiBelgique()) {
   const long = { weekday: "long", day: "numeric", month: "long" };
   if (e.dateFin && autreAnnee(e, aujourdhui)) long.year = "numeric";
   if (e.dateFin) lignes.push(`Du ${formatJour(e.date, long).toLowerCase()} au ${formatJour(e.dateFin, long).toLowerCase()}`);
-  if (e.heureFin) lignes.push(`${e.dateFin ? "Chaque jour de" : "De"} ${e.heure} à ${e.heureFin}`);
+  // Sur plusieurs jours, une fin plus tôt que le début (20:00 → 17:00) n'est pas « chaque jour » (comme l'appli 27.1).
+  if (e.heureFin) {
+    if (!e.dateFin) lignes.push(`De ${e.heure} à ${e.heureFin}`);
+    else if (e.heureFin > e.heure) lignes.push(`Chaque jour de ${e.heure} à ${e.heureFin}`);
+    else lignes.push(`Dès ${e.heure} le premier jour, jusqu'à ${e.heureFin} le dernier jour`);
+  }
   if (e.journee) lignes.push(["affiche", "import", "agenda"].includes(e.source) ? "Heure à préciser" : "Toute la journée");
   return lignes.join("\n");
 }

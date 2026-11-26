@@ -8,7 +8,7 @@ import {
   libelleLieu, chercherLieux, adresseComplete, texteEntree, texteQuand, pastilleDate,
 } from "./lokal.js";
 import {
-  texteMotif, SIGNALEMENTS_POUR_MASQUER, LIGNES_STATS, formatNombre, lireActivite, NOMS_ECRANS, partsEcrans, lireStatutAdmin, codeValide, messageErreurCode, imageQr, JOURS_COURTS, resumeActivite,
+  texteMotif, SIGNALEMENTS_POUR_MASQUER, LIGNES_STATS, formatNombre, lireActivite, NOMS_ECRANS, partsEcrans, lireStatutAdmin, codeValide, messageErreurCode, imageQr, natureLien, JOURS_COURTS, resumeActivite,
   detailAlerte, parCommune, communeDuVillage, nomSource, lienSourceValide, versBrouillons, trouverLieu, dejaSurLokal, messageScan,
   cadrePixels, tailleScan, natureTexte, texteOrigine, pluriel, filtrerNonCertifies, dureeImport, emailAdminValide,
 } from "./admin-lib.js";
@@ -545,7 +545,7 @@ function noterRetrait(r) {
   champ.focus();
 }
 
-// ---- Scanner un panneau, un texte ou un lien (comme l'appli, mode équipe Lokal) ----
+// ---- Ajouter un événement : photos, lien d'une page ou texte (comme l'appli, mode équipe Lokal) ----
 // Plusieurs photos à la fois (demande d'Arnaud du 24 nov. 2026) : lues l'une après l'autre,
 // chaque photo a sa propre case de résultat, vérifiée et publiée séparément. Pas de « Tout publier ».
 const MAX_PHOTOS = 10;
@@ -926,11 +926,8 @@ depot.addEventListener("drop", (e) => {
   e.preventDefault();
   scannerPhotos(e.dataTransfer?.files);
 });
-$("f-texte").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if (lot?.enCours) return toast("Attends la fin de la lecture en cours");
-  const n = natureTexte(e.target.texte.value);
-  if (n.erreur) return erreurScan(n.erreur);
+// Un texte collé ou le lien d'une page : même lecture, même résultat (un lien seul se lit comme une page).
+async function lireTexteOuLien(n) {
   const g = { nom: "", etat: "lecture", source: n.lien ? { type: "import", url: n.lien, nom: nomSource(n.lien) } : { type: "import", url: null, nom: null } };
   nouveauLot([g]);
   const monLot = lot;
@@ -944,6 +941,20 @@ $("f-texte").addEventListener("submit", async (e) => {
   if (lot !== monLot) return liberer(g);
   afficherGroupe(g);
   finLot();
+}
+$("f-texte").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (lot?.enCours) return toast("Attends la fin de la lecture en cours");
+  const n = natureTexte(e.target.texte.value);
+  if (n.erreur) return erreurScan(n.erreur);
+  return lireTexteOuLien(n);
+});
+$("f-lien").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (lot?.enCours) return toast("Attends la fin de la lecture en cours");
+  const n = natureLien(e.target.lien.value);
+  if (n.erreur) return erreurScan(n.erreur);
+  return lireTexteOuLien(n);
 });
 
 // ---- Fondateur : statistiques ----

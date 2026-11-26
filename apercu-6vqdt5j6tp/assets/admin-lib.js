@@ -180,6 +180,14 @@ export function natureTexte(t) {
   return { texte: v.slice(0, TEXTE_MAX) };
 }
 
+// Le champ « Lire la page d'un lien » : seulement un lien https (pas Facebook ni Instagram).
+export function natureLien(t) {
+  const v = String(t ?? "").trim();
+  if (!v) return { erreur: "Colle d'abord le lien de la page" };
+  if (!/^https?:\/\/\S+$/i.test(v)) return { erreur: "Le lien doit commencer par https://" };
+  return natureTexte(v);
+}
+
 // D'où vient un événement non certifié (mêmes mots que l'appli).
 export const ORIGINES = { affiche: "affiche scannée", import: "importé", agenda: "agenda de la commune" };
 export const texteOrigine = (source) => ORIGINES[source] ?? "publié par un invité";

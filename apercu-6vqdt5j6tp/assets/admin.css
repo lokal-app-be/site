@@ -113,6 +113,8 @@
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .grille2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
 @media (min-width: 760px) { .grille2 { grid-template-columns: 1fr 1fr; } }
+/* « Lire la page d'un lien » : toute la largeur au-dessus des photos et du texte, sur chaque écran. */
+#f-lien { margin-bottom: 16px; }
 
 /* Tableau (non certifiés, imports, sans rue) : tableau dès la tablette, cartes sur téléphone */
 .tableau { width: 100%; border-collapse: collapse; font-size: 14px; }
