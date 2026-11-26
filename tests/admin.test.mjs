@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import {
   texteMotif, lireActivite, resumeActivite, detailAlerte, parCommune, communeDuVillage, nomSource, lirePrixTexte, versBrouillons,
   trouverLieu, titresProches, dejaSurLokal, messageScan, cadreValide, cadrePixels, tailleScan, natureTexte, texteOrigine, pluriel,
-  filtrerNonCertifies, dureeImport, emailAdminValide, formatNombre, LIGNES_STATS, partsEcrans, lireStatutAdmin, codeValide, messageErreurCode, imageQr,
+  filtrerNonCertifies, dureeImport, emailAdminValide, formatNombre, LIGNES_STATS, partsEcrans, lireStatutAdmin, codeValide, messageErreurCode, imageQr, natureLien,
 } from "../assets/admin-lib.js";
 import { lireLieux } from "../assets/lokal.js";
 
@@ -145,4 +145,12 @@ test("carré QR : le dessin SVG de Supabase est ré-encodé, rien d'autre n'est 
   assert.equal(imageQr(`data:image/svg+xml;utf-8,${svg}`), attendu);
   assert.equal(imageQr(`data:image/svg+xml;utf-8,${encodeURIComponent(svg)}`), attendu);
   for (const x of ["https://exemple.be/qr.svg", "javascript:alert(1)", "data:text/html,<svg>", "data:image/svg+xml,hello", null]) assert.equal(imageQr(x), "");
+});
+
+test("lire la page d'un lien : https seulement, pas Facebook ni Instagram", () => {
+  assert.deepEqual(natureLien(" https://www.tellin.be/agenda/ "), { lien: "https://www.tellin.be/agenda/" });
+  assert.match(natureLien("").erreur, /Colle d'abord/);
+  assert.match(natureLien("www.tellin.be").erreur, /https/);
+  assert.match(natureLien("http://www.tellin.be").erreur, /https/);
+  assert.match(natureLien("https://www.facebook.com/events/1").erreur, /Facebook/);
 });
