@@ -780,6 +780,7 @@ function afficherPied() {
 function nouveauLot(groupes) {
   fermerResultat();
   erreurScan("");
+  $("erreur-lien").hidden = true;
   lot = { groupes, enCours: true, entete: el("div", { class: "champs" }), pied: el("div") };
   for (const g of groupes) g.noeud = el("section", { class: "groupe-scan champs" });
   resultat.hidden = false;
@@ -955,7 +956,10 @@ $("f-lien").addEventListener("submit", (e) => {
   e.preventDefault();
   if (lot?.enCours) return toast("Attends la fin de la lecture en cours");
   const n = natureLien(e.target.lien.value);
-  if (n.erreur) return erreurScan(n.erreur);
+  // Le message s'affiche juste sous le bouton (bug du 26 nov. : il arrivait plus bas, hors de l'écran).
+  $("erreur-lien").textContent = n.erreur ?? "";
+  $("erreur-lien").hidden = !n.erreur;
+  if (n.erreur) return;
   return lireTexteOuLien(n);
 });
 
