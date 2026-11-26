@@ -109,11 +109,19 @@ export function formatJour(iso, opts) {
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
+// Une des dates de l'événement n'est pas de l'année en cours : il faut écrire l'année (comme l'appli 27.1).
+export function autreAnnee(e, aujourdhui) {
+  const an = aujourdhui.slice(0, 4);
+  return e.date.slice(0, 4) !== an || dernierJour(e).slice(0, 4) !== an;
+}
+
 // Pastille de date, comme dans l'appli : « AUJ. · 20:00 », « SAM 29.11 · 20:00 », « 25.10 → 27.10 · 14:00 ».
+// L'année est ajoutée (« 24.08.26 → 25.01.27 ») dès qu'une date n'est pas de l'année en cours.
 export function pastilleDate(e, aujourdhui) {
+  const annee = autreAnnee(e, aujourdhui);
   const jm = (iso) => {
-    const [, m, d] = iso.split("-");
-    return `${d}.${m}`;
+    const [y, m, d] = iso.split("-");
+    return annee ? `${d}.${m}.${y.slice(2)}` : `${d}.${m}`;
   };
   const h = e.heure ? ` · ${e.heure.slice(0, 5)}` : "";
   if (e.dateFin) return `${e.date === aujourdhui ? "AUJ." : jm(e.date)} → ${jm(e.dateFin)}${h}`;
@@ -167,8 +175,9 @@ export function depuisLigne(l) {
     categorie: estCategorie(l.categorie) ? l.categorie : "autre",
     date: l.date_debut,
     dateFin: l.date_fin,
-    heure: l.journee ? "" : hm(l.heure_debut) || "20:00",
-    journee: !!l.journee,
+    // Agenda des communes : un début à minuit sans « toute la journée » veut dire « heure non donnée » (comme l'appli 27.1).
+    heure: l.journee || (l.source === "agenda" && hm(l.heure_debut) === "00:00") ? "" : hm(l.heure_debut) || "20:00",
+    journee: !!l.journee || (l.source === "agenda" && hm(l.heure_debut) === "00:00"),
     heureFin: hm(l.heure_fin),
     village: l.village,
     lieu: l.lieu,
@@ -203,12 +212,16 @@ export function texteEntree(e) {
 }
 
 // Ligne « Quand » (seulement pour un événement sur plusieurs jours, avec une heure de fin ou toute la journée).
-export function texteQuand(e) {
+// « Du lundi 24 août 2026 au lundi 25 janvier 2027 » : l'année seulement si une date n'est pas de l'année en cours.
+// Sans heure : « Heure à préciser » pour une affiche, une reprise ou l'agenda d'une commune (l'heure est souvent
+// dans la description), sinon « Toute la journée » (comme l'appli 27.1).
+export function texteQuand(e, aujourdhui = aujourdhuiBelgique()) {
   const lignes = [];
   const long = { weekday: "long", day: "numeric", month: "long" };
+  if (e.dateFin && autreAnnee(e, aujourdhui)) long.year = "numeric";
   if (e.dateFin) lignes.push(`Du ${formatJour(e.date, long).toLowerCase()} au ${formatJour(e.dateFin, long).toLowerCase()}`);
   if (e.heureFin) lignes.push(`${e.dateFin ? "Chaque jour de" : "De"} ${e.heure} à ${e.heureFin}`);
-  if (e.journee) lignes.push("Toute la journée");
+  if (e.journee) lignes.push(["affiche", "import", "agenda"].includes(e.source) ? "Heure à préciser" : "Toute la journée");
   return lignes.join("\n");
 }
 

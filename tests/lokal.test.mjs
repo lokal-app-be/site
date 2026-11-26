@@ -3,7 +3,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   aujourdhuiBelgique, joursDuWeekend, periode, dansPeriode, pastilleDate, bientot, ajouterJours, depuisLigne, urlAffiche,
-  imageAgendaOk, texteEntree, adresseComplete, lireLieux, chercherLieux, distanceKm, ecarter, TELLIN, svgIcone } from "../assets/lokal.js";
+  imageAgendaOk, texteEntree, adresseComplete, lireLieux, chercherLieux, distanceKm, ecarter, TELLIN, svgIcone, texteQuand, autreAnnee } from "../assets/lokal.js";
 
 test("aujourd'hui est la date belge, pas celle de l'ordinateur", () => {
   assert.equal(aujourdhuiBelgique(new Date("2026-11-22T23:30:00Z")), "2026-11-23"); // 0 h 30 à Bruxelles
@@ -69,3 +69,24 @@ test("les icônes sont le dessin fixe de l'appli (aucune donnée dedans)", () =>
   assert.equal(svgIcone("<script>"), svgIcone("autre"));
 });
 
+
+test("dates sur deux années : l'année est écrite (yoga de Baillonville, bug du 26 nov.)", () => {
+  const yoga = { date: "2026-08-24", dateFin: "2027-01-25", heure: "", journee: true, heureFin: null, source: "agenda" };
+  assert.ok(autreAnnee(yoga, "2026-11-26"));
+  assert.equal(pastilleDate(yoga, "2026-11-26"), "24.08.26 → 25.01.27");
+  assert.equal(texteQuand(yoga, "2026-11-26"), "Du lundi 24 août 2026 au lundi 25 janvier 2027\nHeure à préciser");
+  assert.equal(pastilleDate({ date: "2027-02-13", heure: "19:00" }, "2026-11-26"), "SAM 13.02.27 · 19:00");
+  // Même année : pas d'année
+  const marche = { date: "2026-12-05", dateFin: "2026-12-06", heure: "", journee: true, heureFin: null, source: "appli" };
+  assert.equal(pastilleDate(marche, "2026-11-26"), "05.12 → 06.12");
+  assert.equal(texteQuand(marche, "2026-11-26"), "Du samedi 5 décembre au dimanche 6 décembre\nToute la journée");
+});
+
+test("agenda des communes : minuit sans « toute la journée » = heure non donnée, jamais « 00:00 »", () => {
+  const ligne = { id: "x", source: "agenda", titre: "Yoga", categorie: "sport", date_debut: "2026-08-24", date_fin: "2027-01-25", heure_debut: "00:00:00", heure_fin: null, journee: false, prix: [] };
+  const e = depuisLigne(ligne);
+  assert.equal(e.heure, "");
+  assert.ok(e.journee);
+  assert.ok(!pastilleDate(e, "2026-11-26").includes("00:00"));
+  assert.equal(depuisLigne({ ...ligne, source: "appli" }).heure, "00:00"); // une vraie soirée à minuit publiée dans l'appli reste
+});
