@@ -1,7 +1,7 @@
 // Admin Lokal sur le site : les règles et les textes de l'écran Admin de l'appli (src/lib/admin.ts, src/lib/scan.ts).
 // Fonctions sans écran, testées automatiquement (tests/admin.test.mjs). Toute la sécurité est dans la base :
 // chaque fonction « admin_… » ou « fondateur_… » vérifie le rôle de la personne connectée.
-import { normaliser, estCategorie, chercherLieux, distanceKm } from "./lokal.js";
+import { normaliser, estCategorie, chercherLieux, distanceKm } from "./lokal.js?v=cff84955b0";
 
 export const MOTIFS = [
   { code: "infos_fausses", texte: "Les infos sont fausses ou ont changé" },

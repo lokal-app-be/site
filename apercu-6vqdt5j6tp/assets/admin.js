@@ -2,17 +2,17 @@
 // chaque lecture et chaque décision passe par une fonction de la base qui vérifie le rôle de la personne
 // connectée (admin ou fondateur). Un compte qui n'est pas de l'équipe ne reçoit rien.
 // Aucune donnée n'est insérée comme du code dans la page : tout passe par textContent.
-import { sb, moi, seDeconnecter, connexionSociale, messageErreurCompte } from "./compte.js";
+import { sb, moi, seDeconnecter, connexionSociale, messageErreurCompte } from "./compte.js?v=cff84955b0";
 import {
   SUPABASE_URL, SUPABASE_CLE, COLONNES, CATEGORIES, svgIcone, depuisLigne, formatJour, aujourdhuiBelgique, lireLieux,
   libelleLieu, chercherLieux, adresseComplete, texteEntree, texteQuand, pastilleDate,
-} from "./lokal.js";
+} from "./lokal.js?v=cff84955b0";
 import {
   texteMotif, SIGNALEMENTS_POUR_MASQUER, LIGNES_STATS, formatNombre, lireActivite, NOMS_ECRANS, partsEcrans, lireStatutAdmin, codeValide, messageErreurCode, imageQr, natureLien, JOURS_COURTS, resumeActivite,
   detailAlerte, parCommune, communeDuVillage, nomSource, lienSourceValide, versBrouillons, trouverLieu, dejaSurLokal, messageScan,
   cadrePixels, tailleScan, natureTexte, texteOrigine, pluriel, filtrerNonCertifies, dureeImport, emailAdminValide,
-} from "./admin-lib.js";
-import { positionDepuisAdresse, adresseDuLieu, versLigne, messageErreur } from "./formulaire.js";
+} from "./admin-lib.js?v=cff84955b0";
+import { positionDepuisAdresse, adresseDuLieu, versLigne, messageErreur } from "./formulaire.js?v=cff84955b0";
 
 const $ = (id) => document.getElementById(id);
 
@@ -550,9 +550,11 @@ function noterRetrait(r) {
 // chaque photo a sa propre case de résultat, vérifiée et publiée séparément. Pas de « Tout publier ».
 const MAX_PHOTOS = 10;
 let lot = null; // { groupes: [{ nom, etat, message, prets, mauvaise, source, publies, noeud }], enCours }
+// Le message reste visible : la page défile jusqu'à lui (sinon il peut être caché sous les blocs, bug du 26 nov.).
 const erreurScan = (t) => {
   $("erreur-scan").textContent = t;
   $("erreur-scan").hidden = !t;
+  if (t) $("erreur-scan").scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 };
 const resultat = $("resultat-scan");
 
@@ -778,6 +780,7 @@ function afficherPied() {
 function nouveauLot(groupes) {
   fermerResultat();
   erreurScan("");
+  $("erreur-lien").hidden = true;
   lot = { groupes, enCours: true, entete: el("div", { class: "champs" }), pied: el("div") };
   for (const g of groupes) g.noeud = el("section", { class: "groupe-scan champs" });
   resultat.hidden = false;
@@ -953,7 +956,10 @@ $("f-lien").addEventListener("submit", (e) => {
   e.preventDefault();
   if (lot?.enCours) return toast("Attends la fin de la lecture en cours");
   const n = natureLien(e.target.lien.value);
-  if (n.erreur) return erreurScan(n.erreur);
+  // Le message s'affiche juste sous le bouton (bug du 26 nov. : il arrivait plus bas, hors de l'écran).
+  $("erreur-lien").textContent = n.erreur ?? "";
+  $("erreur-lien").hidden = !n.erreur;
+  if (n.erreur) return;
   return lireTexteOuLien(n);
 });
 
