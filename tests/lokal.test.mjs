@@ -90,3 +90,11 @@ test("agenda des communes : minuit sans « toute la journée » = heure non donn
   assert.ok(!pastilleDate(e, "2026-11-26").includes("00:00"));
   assert.equal(depuisLigne({ ...ligne, source: "appli" }).heure, "00:00"); // une vraie soirée à minuit publiée dans l'appli reste
 });
+
+test("horaires sur plusieurs jours : jamais « Chaque jour de 20:00 à 17:00 » (Concerts de Noël d'Enghien)", () => {
+  const base = { date: "2026-12-12", dateFin: "2026-12-13", journee: false, source: "agenda" };
+  assert.equal(texteQuand({ ...base, heure: "20:00", heureFin: "17:00" }, "2026-11-26"), "Du samedi 12 décembre au dimanche 13 décembre\nDès 20:00 le premier jour, jusqu'à 17:00 le dernier jour");
+  assert.equal(texteQuand({ ...base, heure: "10:00", heureFin: "18:00" }, "2026-11-26").split("\n")[1], "Chaque jour de 10:00 à 18:00");
+  assert.equal(texteQuand({ ...base, heure: "20:00", heureFin: "20:00" }, "2026-11-26").split("\n")[1], "Dès 20:00 le premier jour, jusqu'à 20:00 le dernier jour");
+  assert.equal(texteQuand({ date: "2026-12-12", heure: "20:00", heureFin: "23:00", journee: false }, "2026-11-26"), "De 20:00 à 23:00");
+});
